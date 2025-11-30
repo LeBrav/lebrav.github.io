@@ -1,8 +1,10 @@
 // Service Worker para Big Crunch PWA
 const CACHE_NAME = 'big-crunch-v1';
+const BASE_PATH = '/'; // Ajusta si tu sitio está en una subcarpeta
 const urlsToCache = [
-  '/',
-  '/webaleatoria_V3.html',
+  BASE_PATH,
+  BASE_PATH + 'webaleatoria_V3.html',
+  BASE_PATH + 'manifest.json',
   'https://cdn.tailwindcss.com',
   'https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Orbitron:wght@400;700;900&display=swap',
   'https://unpkg.com/lucide@latest'

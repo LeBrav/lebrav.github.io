@@ -1073,7 +1073,12 @@
             // Registrar Service Worker para PWA
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('/service-worker.js')
+                    // Detectar si estamos en GitHub Pages (/docs) o raíz
+                    const swPath = window.location.pathname.includes('/docs') 
+                        ? '/docs/service-worker.js' 
+                        : '/service-worker.js';
+                    
+                    navigator.serviceWorker.register(swPath)
                         .then((registration) => {
                             console.log('SW registrado:', registration.scope);
                         })

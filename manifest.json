@@ -2,7 +2,7 @@
   "name": "Big Crunch Assistant",
   "short_name": "Big Crunch",
   "description": "Asistente de Tablero para el juego de mesa Big Crunch",
-  "start_url": "/",
+  "start_url": "/webaleatoria_V3.html",
   "display": "standalone",
   "background_color": "#0b0e14",
   "theme_color": "#1f6feb",
