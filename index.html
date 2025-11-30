@@ -183,132 +183,149 @@
             max-width: 300px;
         }
         
-        /* MAPA VISUAL GRID */
+        /* MAPA VISUAL GRID MEJORADO */
         .map-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 4px;
+            gap: 4px; /* Pequeño espacio visual entre cartas */
             aspect-ratio: 1 / 1;
             width: 100%;
-            max-width: 500px;
+            max-width: 600px; /* Un poco más grande para ver detalles */
             margin: 0 auto;
+            background-color: #05070a;
+            padding: 4px;
+            border-radius: 8px;
         }
         
         .map-cell {
-            background-color: rgba(255, 255, 255, 0.03);
-            border: 1px solid transparent;
-            border-radius: 4px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.6rem;
-            text-align: center;
+            background-color: rgba(22, 27, 34, 0.8);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 2px;
             position: relative;
+            overflow: hidden;
             transition: all 0.3s;
         }
         
-        .map-cell.active {
-            border-color: rgba(255, 255, 255, 0.2);
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
-        }
-        
-        /* Colores por nivel en el mapa */
-        .cell-lvl-1 { background-color: rgba(255, 255, 255, 0.15); color: white; border: 1px solid white; }
-        .cell-lvl-2 { background-color: rgba(31, 111, 235, 0.2); color: #a5d6ff; border: 1px solid #1f6feb; }
-        .cell-lvl-3 { background-color: rgba(46, 160, 67, 0.2); color: #7ee787; border: 1px solid #2ea043; }
-        .cell-lvl-4 { background-color: rgba(210, 153, 34, 0.2); color: #f2cc60; border: 1px solid #d29922; }
-        .cell-lvl-5 { background-color: rgba(219, 109, 40, 0.2); color: #ffdfb6; border: 1px solid #db6d28; }
+        /* Fondos por nivel sutiles */
+        .cell-lvl-1 { background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0) 80%); border-color: rgba(255,255,255,0.2); }
+        .cell-lvl-2 { background: radial-gradient(circle, rgba(31, 111, 235, 0.15) 0%, rgba(0,0,0,0) 80%); border-color: rgba(31, 111, 235, 0.3); }
+        .cell-lvl-3 { background: radial-gradient(circle, rgba(46, 160, 67, 0.15) 0%, rgba(0,0,0,0) 80%); border-color: rgba(46, 160, 67, 0.3); }
+        .cell-lvl-4 { background: radial-gradient(circle, rgba(210, 153, 34, 0.15) 0%, rgba(0,0,0,0) 80%); border-color: rgba(210, 153, 34, 0.3); }
+        .cell-lvl-5 { background: radial-gradient(circle, rgba(219, 109, 40, 0.15) 0%, rgba(0,0,0,0) 80%); border-color: rgba(219, 109, 40, 0.3); }
 
-        .shop-badge {
-            position: absolute;
-            top: -4px;
-            right: -4px;
-            background-color: #a371f7;
-            color: white;
-            font-weight: bold;
-            border-radius: 50%;
-            width: 18px;
-            height: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.6rem;
-            box-shadow: 0 0 5px #a371f7;
-            border: 1px solid white;
-            z-index: 10;
+        /* Sistema Planetario Interno */
+        .system-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
         }
         
-        .event-badge {
+        .planet-node {
             position: absolute;
-            top: -4px;
-            left: -4px;
-            background-color: #3fb950; /* Verde */
-            color: white;
-            font-weight: bold;
+            transform: translate(-50%, -50%);
+            width: 12px;
+            height: 12px;
             border-radius: 50%;
-            width: 18px;
-            height: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.6rem;
-            box-shadow: 0 0 5px #3fb950;
-            border: 1px solid white;
+            background-color: #1f2937; /* Default */
+            border: 2px solid #4b5563;
             z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 4px rgba(0,0,0,0.8);
+            transition: transform 0.2s;
+        }
+        .planet-node:hover {
+            transform: translate(-50%, -50%) scale(1.5);
+            z-index: 20;
+            cursor: help;
         }
 
-        .portal-badge {
+        /* Colores de Planetas según el sistema (opcional, por ahora genéricos con borde blanco) */
+        .planet-node.active-node {
+            background-color: #f0f6fc;
+            border-color: #8b949e;
+        }
+
+        /* Líneas de conexión SVG */
+        .connections-svg {
             position: absolute;
-            bottom: -4px;
-            left: -4px;
-            background-color: #0ea5e9; /* Cyan 500 */
-            color: white;
-            font-weight: bold;
-            border-radius: 50%;
-            width: 18px;
-            height: 18px;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .connection-line {
+            stroke: #ef4444; /* ROJO como en las cartas */
+            stroke-width: 1.5px;
+            opacity: 0.6;
+        }
+
+        .system-danger-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(239, 68, 68, 0.2);
+            border: 2px solid #ef4444;
+            z-index: 5;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.6rem;
-            box-shadow: 0 0 5px #0ea5e9;
-            border: 1px solid white;
-            z-index: 10;
+            pointer-events: none;
+            animation: pulseDanger 2s infinite;
         }
-        
-        .negative-badge {
+        .system-danger-overlay::after {
+            content: "X";
+            font-size: 4rem;
+            font-weight: 900;
+            color: rgba(239, 68, 68, 0.6);
+            transform: rotate(-10deg);
+        }
+        @keyframes pulseDanger {
+            0% { background-color: rgba(239, 68, 68, 0.1); }
+            50% { background-color: rgba(239, 68, 68, 0.3); }
+            100% { background-color: rgba(239, 68, 68, 0.1); }
+        }
+
+        /* Etiquetas flotantes (Badges) sobre planetas */
+        .planet-badge {
             position: absolute;
-            bottom: -4px;
-            right: -4px;
-            background-color: #ef4444; /* Red 500 */
-            color: white;
-            font-weight: bold;
-            border-radius: 50%;
-            width: 18px;
-            height: 18px;
+            top: -8px;
+            right: -8px;
+            font-size: 8px;
+            width: 14px;
+            height: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.6rem;
-            box-shadow: 0 0 5px #ef4444;
+            border-radius: 50%;
+            color: white;
+            font-weight: bold;
+            z-index: 30;
             border: 1px solid white;
-            z-index: 10;
+            box-shadow: 0 0 2px black;
         }
-        
-        .system-name {
+        .badge-shop { background-color: #a371f7; }
+        .badge-event { background-color: #3fb950; }
+        .badge-portal { background-color: #0ea5e9; top: auto; bottom: -8px; }
+        .badge-danger { background-color: #ef4444; bottom: -8px; right: auto; left: -8px; }
+
+        .system-label-overlay {
+            position: absolute;
+            bottom: 2px;
+            left: 2px;
+            font-size: 0.4rem;
+            color: rgba(255,255,255,0.3);
+            pointer-events: none;
+            text-transform: uppercase;
+            max-width: 90%;
+            white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            display: -webkit-box;
-            -webkit-line-clamp: 3; /* Allow 3 lines */
-            line-clamp: 3;
-            -webkit-box-orient: vertical;
-            line-height: 1; /* Tighter line height */
-            padding: 0 2px;
-            word-wrap: break-word; /* Ensure long words break */
-            hyphens: auto;
-            font-size: 0.55rem; /* Slightly smaller font */
-            width: 100%;
         }
 
     </style>
@@ -727,7 +744,9 @@
         function initMap() {
             mapGrid = new Array(49).fill(null);
             // Nivel 1 siempre fijo
-            mapGrid[24] = { systemName: 'Sistema_Tierra', level: 1, shops: 0, eventObjects: 0, eventPortals: 0, eventNegative: 0 };
+            const sysName = 'Sistema_Tierra';
+            const planetStates = { 'Planeta_Tierra_Base': { shops: 0, eventObjects: 0, eventPortals: 0, eventNegative: 0 } };
+            mapGrid[24] = { systemName: sysName, level: 1, planetStates: planetStates };
             renderMap();
         }
 
@@ -742,17 +761,225 @@
             if (level === 5) {
                 const pickedSlots = shuffleArray(slots).slice(0, 2);
                 for(let i=0; i<2; i++) {
-                    mapGrid[pickedSlots[i]] = { systemName: sistemas[i], level: 5, shops: 0, eventObjects: 0, eventPortals: 0, eventNegative: 0 };
+                    // Initialize planet states for specific tracking
+                    const sysName = sistemas[i];
+                    const planetas = SYSTEM_PLANET_RELATION[sysName] || [];
+                    const planetStates = {};
+                    planetas.forEach(p => {
+                        planetStates[p] = { shops: 0, eventObjects: 0, eventPortals: 0, eventNegative: 0 };
+                    });
+                    
+                    mapGrid[pickedSlots[i]] = { 
+                        systemName: sysName, 
+                        level: 5, 
+                        planetStates: planetStates 
+                    };
                 }
             } else {
                 // Niveles 2, 3, 4 llenan todos sus slots
                 for(let i=0; i<slots.length; i++) {
                     if (sistemas[i]) {
-                        mapGrid[slots[i]] = { systemName: sistemas[i], level: level, shops: 0, eventObjects: 0, eventPortals: 0, eventNegative: 0 };
+                        const sysName = sistemas[i];
+                        const planetas = SYSTEM_PLANET_RELATION[sysName] || [];
+                        const planetStates = {};
+                        planetas.forEach(p => {
+                            planetStates[p] = { shops: 0, eventObjects: 0, eventPortals: 0, eventNegative: 0 };
+                        });
+
+                        mapGrid[slots[i]] = { 
+                            systemName: sysName, 
+                            level: level, 
+                            planetStates: planetStates
+                        };
                     }
                 }
             }
             renderMap();
+        }
+
+        // --- CONFIGURACIÓN VISUAL DE SISTEMAS ---
+        const SYSTEM_LAYOUTS_CONFIG = {
+            // NIVEL 1
+            'Sistema_Tierra': {
+                nodes: [ { id: 'Planeta_Tierra_Base', x: 50, y: 50 } ],
+                connections: [],
+                exits: { N: 'Planeta_Tierra_Base', E: 'Planeta_Tierra_Base', S: 'Planeta_Tierra_Base', W: 'Planeta_Tierra_Base' }
+            },
+
+            // NIVEL 2
+            'Sistema_Fuego': {
+                nodes: [
+                    { id: 'Planeta_Llamas', x: 50, y: 20 }, // Arriba
+                    { id: 'Planeta_Chispa', x: 80, y: 60 }, // Der
+                    { id: 'Planeta_Magma', x: 20, y: 60 }   // Izq
+                ],
+                connections: [['Planeta_Llamas','Planeta_Chispa'], ['Planeta_Chispa','Planeta_Magma'], ['Planeta_Magma','Planeta_Llamas']],
+                exits: { N: 'Planeta_Llamas', E: 'Planeta_Chispa', S: 'Planeta_Chispa', W: 'Planeta_Magma' }
+            },
+            'Sistema_Viento': {
+                nodes: [
+                    { id: 'Planeta_Burbuja', x: 30, y: 40 }, // Izq Arriba
+                    { id: 'Planeta_Torrnado', x: 70, y: 60 } // Der Abajo
+                ],
+                connections: [['Planeta_Burbuja', 'Planeta_Torrnado']],
+                exits: { N: 'Planeta_Burbuja', E: 'Planeta_Torrnado', S: 'Planeta_Torrnado', W: 'Planeta_Burbuja' }
+            },
+            'Sistema_Tierra_Elemental': { // "sistema tierra" en imagen
+                nodes: [
+                    { id: 'Planeta_Roca', x: 70, y: 30 },    // Arriba Der
+                    { id: 'Planeta_Botanico', x: 20, y: 40 },// Izq
+                    { id: 'Planeta_Barro', x: 50, y: 80 }    // Abajo
+                ],
+                connections: [['Planeta_Roca','Planeta_Barro'], ['Planeta_Barro','Planeta_Botanico'], ['Planeta_Botanico','Planeta_Roca']],
+                exits: { N: 'Planeta_Roca', E: 'Planeta_Roca', S: 'Planeta_Barro', W: 'Planeta_Botanico' }
+            },
+            'Sistema_Agua': {
+                nodes: [
+                    { id: 'Planeta_Olas', x: 40, y: 30 }, // Arriba Izq
+                    { id: 'Planeta_Gota', x: 60, y: 70 }  // Abajo Der
+                ],
+                connections: [['Planeta_Olas', 'Planeta_Gota']],
+                exits: { N: 'Planeta_Olas', E: 'Planeta_Olas', S: 'Planeta_Gota', W: 'Planeta_Olas' }
+            },
+
+            // NIVEL 3
+            'Sistema_Prehistorico': {
+                nodes: [
+                    { id: 'Planeta_Hueso', x: 20, y: 25 },    // Arriba Izq
+                    { id: 'Planeta_Fosil', x: 80, y: 25 },    // Arriba Der
+                    { id: 'Planeta_HuevoDino', x: 50, y: 70 } // Abajo
+                ],
+                connections: [['Planeta_Hueso','Planeta_Fosil'], ['Planeta_Fosil','Planeta_HuevoDino'], ['Planeta_HuevoDino','Planeta_Hueso']],
+                exits: { N: 'Planeta_Hueso', E: 'Planeta_Fosil', S: 'Planeta_HuevoDino', W: 'Planeta_Hueso' }
+            },
+            'Sistema_FarWest': {
+                nodes: [
+                    { id: 'Planeta_Dinamita', x: 50, y: 20 },    // Arriba
+                    { id: 'Planeta_GorroCowboy', x: 80, y: 50 }, // Der
+                    { id: 'Planeta_Barril', x: 70, y: 80 }, // Abajo Der
+                    { id: 'Planeta_Rueda', x: 20, y: 60 }        // Izq
+                ],
+                connections: [['Planeta_Dinamita','Planeta_GorroCowboy'], ['Planeta_GorroCowboy','Planeta_Barril'], ['Planeta_Barril','Planeta_Rueda'], ['Planeta_Rueda','Planeta_Dinamita']],
+                exits: { N: 'Planeta_Dinamita', E: 'Planeta_GorroCowboy', S: 'Planeta_Barril', W: 'Planeta_Rueda' }
+            },
+            'Sistema_Medieval': {
+                nodes: [
+                    { id: 'Planeta_Yelmo', x: 70, y: 30 },   // Arriba Der
+                    { id: 'Planeta_Castillo', x: 50, y: 70 }, // Abajo
+                    { id: 'Planeta_Cadenas', x: 20, y: 80 },  // Abajo Izq
+                    { id: 'Planeta_Escudo', x: 20, y: 40 }    // Arriba Izq
+                ],
+                connections: [['Planeta_Yelmo','Planeta_Castillo'], ['Planeta_Castillo','Planeta_Cadenas'], ['Planeta_Cadenas','Planeta_Escudo'], ['Planeta_Escudo','Planeta_Yelmo']],
+                exits: { N: 'Planeta_Yelmo', E: 'Planeta_Yelmo', S: 'Planeta_Castillo', W: 'Planeta_Cadenas' }
+            },
+            'Sistema_Futurista': {
+                nodes: [
+                    { id: 'Planeta_Neon', x: 40, y: 20 },     // Arriba
+                    { id: 'Planeta_PlacaBase', x: 80, y: 40 }, // Der
+                    { id: 'Planeta_Holograma', x: 50, y: 85 }  // Abajo
+                ],
+                connections: [['Planeta_Neon','Planeta_PlacaBase'], ['Planeta_PlacaBase','Planeta_Holograma'], ['Planeta_Holograma','Planeta_Neon']],
+                exits: { N: 'Planeta_Neon', E: 'Planeta_PlacaBase', S: 'Planeta_Holograma', W: 'Planeta_Neon' }
+            },
+
+            // NIVEL 4
+            'Sistema_Windows': {
+                nodes: [
+                    { id: 'Planeta_InternetExplorer', x: 50, y: 15 }, // Arriba "explorer"
+                    { id: 'Planeta_Archivos', x: 80, y: 50 },         // Der "archivos"
+                    { id: 'Planeta_MiPC', x: 50, y: 85 },             // Abajo "mi pc"
+                    { id: 'Planeta_Papelera', x: 20, y: 50 }          // Izq "papelera"
+                ],
+                connections: [['Planeta_InternetExplorer','Planeta_Archivos'], ['Planeta_Archivos','Planeta_MiPC'], ['Planeta_MiPC','Planeta_Papelera'], ['Planeta_Papelera','Planeta_InternetExplorer']],
+                exits: { N: 'Planeta_InternetExplorer', E: 'Planeta_Archivos', S: 'Planeta_MiPC', W: 'Planeta_Papelera' }
+            },
+            'Sistema_Deporte': {
+                nodes: [
+                    { id: 'Planeta_Tenis', x: 40, y: 15 },   // Arriba
+                    { id: 'Planeta_Voley', x: 85, y: 20 },   // Arriba Der
+                    { id: 'Planeta_Futbol', x: 85, y: 60 },  // Abajo Der
+                    { id: 'Planeta_Beisbol', x: 50, y: 85 }, // Abajo
+                    { id: 'Planeta_Basket', x: 15, y: 50 }   // Izq
+                ],
+                connections: [['Planeta_Tenis','Planeta_Voley'], ['Planeta_Voley','Planeta_Futbol'], ['Planeta_Futbol','Planeta_Beisbol'], ['Planeta_Beisbol','Planeta_Basket'], ['Planeta_Basket','Planeta_Tenis']],
+                exits: { N: 'Planeta_Tenis', E: 'Planeta_Futbol', S: 'Planeta_Beisbol', W: 'Planeta_Basket' }
+            },
+            'Sistema_Pizza': {
+                nodes: [
+                    { id: 'Planeta_Cebolla', x: 20, y: 30 },   // Arriba Izq
+                    { id: 'Planeta_Tomate', x: 70, y: 30 },    // Arriba Der
+                    { id: 'Planeta_Champiñon', x: 50, y: 90 }, // Abajo
+                    { id: 'Planeta_Pepperoni', x: 20, y: 80 }, // Abajo Izq
+                    { id: 'Planeta_Queso', x: 50, y: 60 }      // Centro
+                ],
+                connections: [['Planeta_Cebolla','Planeta_Tomate'], ['Planeta_Tomate','Planeta_Queso'], ['Planeta_Queso','Planeta_Pepperoni'], ['Planeta_Pepperoni','Planeta_Cebolla'], ['Planeta_Queso', 'Planeta_Champiñon']],
+                exits: { N: 'Planeta_Cebolla', E: 'Planeta_Tomate', S: 'Planeta_Champiñon', W: 'Planeta_Pepperoni' }
+            },
+            'Sistema_Chuche': {
+                nodes: [
+                    { id: 'Planeta_Gominola', x: 50, y: 20 }, // Arriba
+                    { id: 'Planeta_Chicle', x: 85, y: 45 },   // Der
+                    { id: 'Planeta_Piruleta', x: 80, y: 80 }, // Abajo Der
+                    { id: 'Planeta_Nube', x: 20, y: 75 }      // Abajo Izq
+                ],
+                connections: [['Planeta_Gominola','Planeta_Chicle'], ['Planeta_Chicle','Planeta_Piruleta'], ['Planeta_Piruleta','Planeta_Nube'], ['Planeta_Nube','Planeta_Gominola']],
+                exits: { N: 'Planeta_Gominola', E: 'Planeta_Chicle', S: 'Planeta_Piruleta', W: 'Planeta_Nube' }
+            },
+
+            // NIVEL 5
+            'Sistema_Gemas': {
+                nodes: [
+                    { id: 'Planeta_Esmalte', x: 25, y: 20 },      // Arriba Izq
+                    { id: 'Planeta_Lapislazuli', x: 75, y: 20 },  // Arriba Der
+                    { id: 'Planeta_Topacio', x: 90, y: 50 },      // Der
+                    { id: 'Planeta_Rubi', x: 50, y: 80 },         // Abajo
+                    { id: 'Planeta_Diamante', x: 10, y: 50 }      // Izq
+                ],
+                connections: [['Planeta_Esmalte','Planeta_Lapislazuli'], ['Planeta_Lapislazuli','Planeta_Topacio'], ['Planeta_Topacio','Planeta_Rubi'], ['Planeta_Rubi','Planeta_Diamante'], ['Planeta_Diamante','Planeta_Esmalte']],
+                exits: { N: 'Planeta_Lapislazuli', E: 'Planeta_Topacio', S: 'Planeta_Rubi', W: 'Planeta_Diamante' }
+            },
+            'Sistema_Geometria_Minimalista': {
+                nodes: [
+                    { id: 'Planeta_Poligono_6', x: 30, y: 20 }, // Arriba Izq (Hex)
+                    { id: 'Planeta_Poligono_4', x: 70, y: 40 }, // Arriba Der (Cuadrado)
+                    { id: 'Planeta_Poligono_3', x: 50, y: 80 }, // Abajo (Triangulo)
+                    { id: 'Planeta_Poligono_5', x: 20, y: 70 }, // Abajo Izq (Pentagono)
+                    { id: 'Planeta_Poligono_7', x: 85, y: 75 }  // Abajo Der (Octogono en imagen, es 7 o 8?)
+                ],
+                connections: [['Planeta_Poligono_6','Planeta_Poligono_4'], ['Planeta_Poligono_4','Planeta_Poligono_7'], ['Planeta_Poligono_7','Planeta_Poligono_3'], ['Planeta_Poligono_3','Planeta_Poligono_5'], ['Planeta_Poligono_5','Planeta_Poligono_6']],
+                exits: { N: 'Planeta_Poligono_6', E: 'Planeta_Poligono_4', S: 'Planeta_Poligono_3', W: 'Planeta_Poligono_5' }
+            }
+        };
+
+        function getSystemLayout(systemName) {
+            // Si tenemos config manual, usarla
+            if (SYSTEM_LAYOUTS_CONFIG[systemName]) {
+                return SYSTEM_LAYOUTS_CONFIG[systemName];
+            }
+            
+            // Fallback automático si falta alguno
+            const planets = SYSTEM_PLANET_RELATION[systemName] || ['Unknown'];
+            const count = planets.length;
+            let nodes = [];
+            
+            // ... (Lógica de fallback simple anterior) ...
+            const radius = 35;
+            const centerX = 50;
+            const centerY = 50;
+            for(let i=0; i<count; i++) {
+                const angle = (i / count) * 2 * Math.PI - (Math.PI/2);
+                nodes.push({
+                    id: planets[i],
+                    x: centerX + radius * Math.cos(angle),
+                    y: centerY + radius * Math.sin(angle)
+                });
+            }
+            
+            return {
+                nodes: nodes,
+                connections: [], // No auto-connections
+                exits: { N: nodes[0]?.id, E: nodes[1]?.id, S: nodes[nodes.length-1]?.id, W: nodes[nodes.length-1]?.id }
+            };
         }
 
         function renderMap() {
@@ -765,16 +992,69 @@
                 
                 const data = mapGrid[i];
                 if (data) {
-                    cell.classList.add(`cell-lvl-${data.level}`, 'active');
+                    cell.classList.add(`cell-lvl-${data.level}`);
+                    
+                    const layout = getSystemLayout(data.systemName);
+                    const nodes = layout.nodes;
+                    const connections = layout.connections;
+                    const exits = layout.exits;
+                    
+                    // SVG Connections
+                    let svgHTML = `<svg class="connections-svg" viewBox="0 0 100 100">`;
+                    
+                    // 1. External Connections (Salidas)
+                    // Siempre conectamos al centro de los bordes (50,0), (100,50), (50,100), (0,50)
+                    if (exits) {
+                        const nNode = nodes.find(n => n.id === exits.N);
+                        if(nNode) svgHTML += `<line x1="${nNode.x}" y1="${nNode.y}" x2="50" y2="0" class="connection-line" />`;
+                        
+                        const eNode = nodes.find(n => n.id === exits.E);
+                        if(eNode) svgHTML += `<line x1="${eNode.x}" y1="${eNode.y}" x2="100" y2="50" class="connection-line" />`;
+                        
+                        const sNode = nodes.find(n => n.id === exits.S);
+                        if(sNode) svgHTML += `<line x1="${sNode.x}" y1="${sNode.y}" x2="50" y2="100" class="connection-line" />`;
+                        
+                        const wNode = nodes.find(n => n.id === exits.W);
+                        if(wNode) svgHTML += `<line x1="${wNode.x}" y1="${wNode.y}" x2="0" y2="50" class="connection-line" />`;
+                    }
+                    
+                    // 2. Internal Connections
+                    connections.forEach(pair => {
+                         const p1 = nodes.find(n => n.id === pair[0]);
+                         const p2 = nodes.find(n => n.id === pair[1]);
+                         if (p1 && p2) {
+                             svgHTML += `<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" class="connection-line" />`;
+                         }
+                    });
+                    
+                    svgHTML += `</svg>`;
+                    
+                    // Planets Nodes
+                    let nodesHTML = '';
+                    nodes.forEach(p => {
+                        const pState = data.planetStates && data.planetStates[p.id] ? data.planetStates[p.id] : { shops:0, eventObjects:0, eventPortals:0, eventNegative:0 };
+                        
+                        let badges = '';
+                        if(pState.shops > 0) badges += `<div class="planet-badge badge-shop">${pState.shops}</div>`;
+                        if(pState.eventObjects > 0) badges += `<div class="planet-badge badge-event">!</div>`;
+                        if(pState.eventPortals > 0) badges += `<div class="planet-badge badge-portal">P</div>`;
+                        if(pState.eventNegative > 0) badges += `<div class="planet-badge badge-danger">X</div>`;
+
+                        nodesHTML += `
+                            <div class="planet-node active-node" style="left: ${p.x}%; top: ${p.y}%;" title="${p.id}">
+                                ${badges}
+                            </div>
+                        `;
+                    });
+
                     cell.innerHTML = `
-                        ${data.shops > 0 ? `<div class="shop-badge animate-bounce">${data.shops}</div>` : ''}
-                        ${data.eventObjects > 0 ? `<div class="event-badge animate-pulse">${data.eventObjects}</div>` : ''}
-                        ${data.eventPortals > 0 ? `<div class="portal-badge animate-pulse">P</div>` : ''}
-                        ${data.eventNegative > 0 ? `<div class="negative-badge animate-pulse">${data.eventNegative}</div>` : ''}
-                        <span class="system-name">${data.systemName.replace('Sistema_', '').replace(/_/g, ' ')}</span>
+                        <div class="system-container">
+                            ${data.systemDanger ? '<div class="system-danger-overlay"></div>' : ''}
+                            ${svgHTML}
+                            ${nodesHTML}
+                            <div class="system-label-overlay">${data.systemName.replace('Sistema_', '').replace(/_/g, ' ')}</div>
+                        </div>
                     `;
-                    // Tooltip-like title
-                    cell.title = `${data.systemName} (Nivel ${data.level})`;
                 }
 
                 gridEl.appendChild(cell);
@@ -893,8 +1173,12 @@
         function generateShopLocations() {
             const detailOut = document.getElementById('shop-locations-details');
             
-            // Limpiar shops previos
-            mapGrid.forEach(c => { if(c) c.shops = 0; });
+            // Limpiar shops previos (en planetStates)
+            mapGrid.forEach(c => { 
+                if(c && c.planetStates) {
+                    Object.values(c.planetStates).forEach(st => st.shops = 0);
+                }
+            });
 
             let planetasActivos = [];
             for (let n = 2; n <= nivelActual; n++) {
@@ -910,7 +1194,7 @@
             }
 
             let numSistemas = 0;
-            mapGrid.forEach(c => { if(c && c.level > 1) numSistemas++; }); // Count active systems > lvl 1
+            mapGrid.forEach(c => { if(c && c.level > 1) numSistemas++; }); 
 
             const minShops = Math.max(1, Math.floor(numSistemas / 2));
             const shuffledPlanets = shuffleArray([...planetasActivos]);
@@ -923,15 +1207,19 @@
                 const system = PLANET_TO_SYSTEM_MAP[planet];
                 // Encontrar celda del sistema
                 const cellIndex = mapGrid.findIndex(c => c && c.systemName === system);
-                if (cellIndex !== -1) {
-                    mapGrid[cellIndex].shops++;
+                if (cellIndex !== -1 && mapGrid[cellIndex].planetStates) {
+                    // Asignar tienda al planeta específico
+                    if (!mapGrid[cellIndex].planetStates[planet]) {
+                         mapGrid[cellIndex].planetStates[planet] = { shops: 0, eventObjects: 0, eventPortals: 0, eventNegative: 0 };
+                    }
+                    mapGrid[cellIndex].planetStates[planet].shops++;
                     locationListHTML += `<li><span class="text-blue-300">${planet}</span> <span class="text-[10px] text-gray-500">(${system.replace('Sistema_', '')})</span></li>`;
                 }
             });
             locationListHTML += '</ul>';
 
             detailOut.innerHTML = locationListHTML;
-            renderMap(); // Re-render to show badges
+            renderMap(); 
         }
 
         function generateItem(tipo, nivel, forcedRarity = null) {
@@ -1033,15 +1321,24 @@
             out.innerHTML = ''; 
             
             // Reset previous event markers
-            mapGrid.forEach(c => { if(c) { c.eventObjects = 0; c.eventPortals = 0; c.eventNegative = 0; } });
+            mapGrid.forEach(c => { 
+                if(c) {
+                    c.systemDanger = false; // Reset flag
+                    if (c.planetStates) {
+                        Object.values(c.planetStates).forEach(st => {
+                            st.eventObjects = 0; 
+                            st.eventPortals = 0; 
+                            st.eventNegative = 0; 
+                        });
+                    }
+                }
+            });
             
             let sistemasActivos = [];
             let planetasActivos = [];
             // Usar mapGrid para determinar que esta activo realmente
             mapGrid.forEach(cell => {
                 if (cell) {
-                    // Reconstruir planetas activos basado en sistema
-                     // Esto requiere buscar en SYSTEM_PLANET_RELATION
                      const planets = SYSTEM_PLANET_RELATION[cell.systemName];
                      if (planets) planetasActivos = planetasActivos.concat(planets);
                      sistemasActivos.push(cell.systemName);
@@ -1065,7 +1362,10 @@
                 targets.forEach(target => {
                     const sysName = PLANET_TO_SYSTEM_MAP[target];
                     const cellIndex = mapGrid.findIndex(c => c && c.systemName === sysName);
-                    if (cellIndex !== -1) mapGrid[cellIndex].eventPortals = 1;
+                    if (cellIndex !== -1 && mapGrid[cellIndex].planetStates) {
+                        if (!mapGrid[cellIndex].planetStates[target]) mapGrid[cellIndex].planetStates[target] = {shops:0, eventObjects:0, eventPortals:0, eventNegative:0};
+                        mapGrid[cellIndex].planetStates[target].eventPortals = 1;
+                    }
                 });
 
                 positiveEventHTML = `
@@ -1079,13 +1379,14 @@
             } else {
                 const targetPlanet = getRandomElement(planetasActivos);
                 const randomObj = getRandomElement(EVENTO_OBJETOS_POOL);
-                const cardHTML = createItemCardHTML(randomObj, true);
+                const cardHTML = createItemCardHTML(randomObj, true); // Compact
                 
                 // Update Map Grid for Event
                 const sysName = PLANET_TO_SYSTEM_MAP[targetPlanet];
                 const cellIndex = mapGrid.findIndex(c => c && c.systemName === sysName);
-                if (cellIndex !== -1) {
-                    mapGrid[cellIndex].eventObjects++;
+                if (cellIndex !== -1 && mapGrid[cellIndex].planetStates) {
+                    if (!mapGrid[cellIndex].planetStates[targetPlanet]) mapGrid[cellIndex].planetStates[targetPlanet] = {shops:0, eventObjects:0, eventPortals:0, eventNegative:0};
+                    mapGrid[cellIndex].planetStates[targetPlanet].eventObjects++;
                 }
 
                 positiveEventHTML = `
@@ -1108,27 +1409,30 @@
                 let desc = "";
                 let icon = "alert-octagon";
                 
-                // Logic to find target system for marker
+                // Targets
                 let targetSysName = null;
+                let targetPlanetName = null; 
 
                 if (ev === 'Evento_Explosion_Sistema') {
-                    const target = getRandomElement(sistemasActivos); // is system name
+                    const target = getRandomElement(sistemasActivos); // system
                     targetSysName = target;
                     desc = `Sistema <strong class="text-white">${target.replace('Sistema_','')}</strong> explotará.`;
                     icon = "flame";
                 } else if (ev === 'Evento_Sistema_Infectado') {
-                    const target = getRandomElement(sistemasActivos); // is system name
+                    const target = getRandomElement(sistemasActivos); // system
                     targetSysName = target;
                     desc = `Sistema <strong class="text-white">${target.replace('Sistema_','')}</strong> infectado (Daño 1/turno).`;
                     icon = "skull";
                 } else if (ev === 'Evento_Basura Espacial') {
-                    const target = getRandomElement(planetasActivos); // is planet name
+                    const target = getRandomElement(planetasActivos); // planet
                     targetSysName = PLANET_TO_SYSTEM_MAP[target];
+                    targetPlanetName = target;
                     desc = `Basura en <strong class="text-white">${target}</strong> (Daño 1).`;
                     icon = "satellite";
                 } else { 
-                    const target = getRandomElement(planetasActivos); // is planet name
+                    const target = getRandomElement(planetasActivos); // planet
                     targetSysName = PLANET_TO_SYSTEM_MAP[target];
+                    targetPlanetName = target;
                     desc = `Rebelión en <strong class="text-white">${target}</strong> (Daño 1).`;
                     icon = "shield-alert";
                 }
@@ -1136,7 +1440,18 @@
                 // Update Map Grid for Negative Event
                 if (targetSysName) {
                     const cellIndex = mapGrid.findIndex(c => c && c.systemName === targetSysName);
-                    if (cellIndex !== -1) mapGrid[cellIndex].eventNegative++;
+                    if (cellIndex !== -1 && mapGrid[cellIndex].planetStates) {
+                        // Si es evento de sistema, marcar LA CELDA ENTERA
+                        if (ev === 'Evento_Explosion_Sistema' || ev === 'Evento_Sistema_Infectado') {
+                             mapGrid[cellIndex].systemDanger = true; // Nueva bandera
+                        } else {
+                            // Evento de un solo planeta
+                            if (targetPlanetName) {
+                                if (!mapGrid[cellIndex].planetStates[targetPlanetName]) mapGrid[cellIndex].planetStates[targetPlanetName] = {shops:0, eventObjects:0, eventPortals:0, eventNegative:0};
+                                mapGrid[cellIndex].planetStates[targetPlanetName].eventNegative++;
+                            }
+                        }
+                    }
                 }
 
                 negativeEventsHTML += `
