@@ -269,26 +269,53 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(239, 68, 68, 0.2);
-            border: 2px solid #ef4444;
+            background-color: rgba(239, 68, 68, 0.15); /* Mas transparente */
+            border: 3px solid #ef4444;
             z-index: 5;
             display: flex;
             align-items: center;
             justify-content: center;
             pointer-events: none;
-            animation: pulseDanger 2s infinite;
+            animation: pulseExplosion 1s infinite;
         }
         .system-danger-overlay::after {
-            content: "X";
-            font-size: 4rem;
-            font-weight: 900;
-            color: rgba(239, 68, 68, 0.6);
-            transform: rotate(-10deg);
+            content: "💥";
+            font-size: 2rem; /* Mas pequeño */
+            opacity: 0.6;    /* Mas transparente */
+            filter: drop-shadow(0 0 5px red);
         }
-        @keyframes pulseDanger {
-            0% { background-color: rgba(239, 68, 68, 0.1); }
-            50% { background-color: rgba(239, 68, 68, 0.3); }
-            100% { background-color: rgba(239, 68, 68, 0.1); }
+        
+        .system-infected-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(239, 68, 68, 0.15); /* Rojo transparente (igual que explosion) */
+            border: 3px solid #ef4444; /* Rojo */
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            animation: pulseInfected 2s infinite;
+        }
+        .system-infected-overlay::after {
+            content: "☣️";
+            font-size: 2rem; 
+            opacity: 0.6;
+            filter: drop-shadow(0 0 5px red);
+        }
+        @keyframes pulseInfected {
+            0% { background-color: rgba(239, 68, 68, 0.1); border-color: #ef4444; }
+            50% { background-color: rgba(239, 68, 68, 0.25); border-color: #f87171; }
+            100% { background-color: rgba(239, 68, 68, 0.1); border-color: #ef4444; }
+        }
+
+        @keyframes pulseExplosion {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; background-color: rgba(239, 68, 68, 0.5); }
+            100% { transform: scale(1); opacity: 0.8; }
         }
 
         /* Etiquetas flotantes (Badges) sobre planetas */
@@ -427,7 +454,7 @@
                         3. Eventos de Turno
                     </h2>
                     <button onclick="generateEvent()" class="btn btn-danger w-full py-3 rounded-lg font-semibold shadow-md mb-4 bg-opacity-80">
-                        GENERAR 3 EVENTOS
+                        GENERAR EVENTOS
                     </button>
                     <div id="event-output" class="bg-[#0d1117] border border-gray-800 p-4 rounded-xl text-sm text-gray-300 flex flex-col gap-2 min-h-[150px]">
                         <div class="text-center italic text-gray-500 my-auto">Pulsa para generar los eventos...</div>
@@ -534,6 +561,20 @@
                         Cuando un sistema planetario explota, <strong class="text-white">ya no se puede pasar por ahí</strong> a menos que tengas la habilidad <strong class="text-cyan-400">Llave Temporal</strong>.
                     </p>
                 </div>
+
+                <!-- Interacción y Compartir -->
+                <div class="bg-[#0d1117] p-4 rounded-lg border-l-4 border-purple-500">
+                    <h3 class="font-bold text-purple-400 mb-2 flex items-center gap-2">
+                        <i data-lucide="users" class="w-4 h-4"></i>
+                        Interacción y Compartir
+                    </h3>
+                    <ul class="list-disc list-inside space-y-1 ml-2 text-gray-300">
+                        <li><strong class="text-white">Movimiento e Interacción:</strong> Si te mueves (ej. 4 planetas), puedes interactuar con TODO lo que encuentres por el camino (tiendas, objetos, etc.) en el mismo turno.</li>
+                        <li><strong class="text-white">Compartir (Default):</strong> Si otro jugador está en el mismo <strong class="text-white">Planeta</strong>, puedes transferirle Combustible o Cartas (según acuerdo).</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
             </div>
         </div>
 
@@ -545,7 +586,7 @@
         // --- CONFIGURACIÓN GLOBAL ---
         let nivelActual = 1;
         let faseJuego = 'EXPANSION'; 
-        let turnosParaBigCrunch = 1; 
+        let turnosParaBigCrunch = 2;  
         
         // ESTADO DEL MAPA (7x7 Grid)
         // Indices 0-48. Center is 24 (Row 3, Col 3).
@@ -613,12 +654,22 @@
             planets.forEach(p => PLANET_TO_SYSTEM_MAP[p] = sys);
         }
 
-        const EVENTOS_NEGATIVOS = ['Evento_Explosion_Sistema', 'Evento_Sistema_Infectado', 'Evento_Basura Espacial', 'Planeta_Rebelde'];
+        const EVENTOS_NEGATIVOS_SISTEMA = ['Evento_Explosion_Sistema', 'Evento_Sistema_Infectado'];
+        const EVENTOS_NEGATIVOS_PLANETA = ['Evento_Basura Espacial', 'Planeta_Rebelde']; // Personales separado
         const EVENTO_OBJETOS_POOL = [
             { id: 'Combustible_Lata_Pequeña', tipoObjeto: 'Combustible', rareza: 'comun', desc: '+3 Combustible' },
             { id: 'Medkit_Pequeño', tipoObjeto: 'Vida', rareza: 'comun', desc: '+2 HP' },
             { id: 'Estelar_BrilloEstelar', tipoObjeto: 'Potencia', rareza: 'comun', potenciaValor: 1 },
             { id: 'Oscura_Pozo', tipoObjeto: 'Potencia', rareza: 'comun', potenciaValor: 1 }
+        ];
+        const POTENCIA_3_POOL = [
+             { id: 'Estelar_NucleoEstelar', tipoObjeto: 'Potencia', rareza: 'epico', potenciaValor: 3 },
+             { id: 'Oscura_ColapsoGravitacional', tipoObjeto: 'Potencia', rareza: 'epico', potenciaValor: 3 }
+        ];
+        const EVENTOS_PERSONALES_POOL = [
+            { id: 'ChoqueEspacial', desc: 'Jugador {ROLE} → Vida -2.' },
+            { id: 'SobrecalentamientoMotor', desc: 'Jugador {ROLE} → Combustible -2.' },
+            { id: 'Interferencias', desc: 'Jugador {ROLE} no puede hablar hasta SIGUIENTE TURNO.', rareza: 'epico' } // 10%
         ];
 
         const ITEMS_POR_TIPO = {
@@ -640,6 +691,9 @@
                 { id: 'Oscura_OrbitaDensa', rareza: 'raro', niveles: [3, 4, 5], potenciaValor: 2 },
                 { id: 'Oscura_ColapsoGravitacional', rareza: 'epico', niveles: [4, 5], potenciaValor: 3 },
             ],
+            Especial: [
+                { id: 'Carta_UltimaVoluntad_CorreoPrime', rareza: 'epico', niveles: [2, 3, 4, 5], desc: 'AL MORIR: Envía fichas Potencia y hasta 2 cartas a un jugador vivo.' },
+            ],
             Habilidad: [
                 { id: 'Habilidad_Estelar_Chispa', rareza: 'raro', niveles: [2, 3], desc: 'ACTIVA: Mueve +1 planeta gratis al comprar Estelar.' },
                 { id: 'Habilidad_Grav_AtraerObjeto', rareza: 'raro', niveles: [3, 4], desc: 'ACTIVA: Atrae objeto (dist 3).' },
@@ -653,11 +707,8 @@
                 { id: 'Habilidad_EstabilizadorEstelar', rareza: 'raro', niveles: [4, 5], desc: 'ACTIVA: Evita la explosión inminente de un sistema planetario (un solo uso, donde sea del universo).' },
                 { id: 'Habilidad_CrearPortal', rareza: 'epico', niveles: [4, 5], desc: 'ACTIVA: Crea un portal de 2 o 3 planetas donde tú quieras del universo.' },
                 { id: 'Habilidad_DisfrazRebelde', rareza: 'raro', niveles: [3, 4, 5], desc: 'PASIVA: No te afectan los planetas rebeldes.' },
+                { id: 'Habilidad_CompartirEsVivir', rareza: 'raro', niveles: [3, 4, 5], desc: 'ACTIVA: Puedes transferir 2 Vida y/o 3 Combustible tuyos a un aliado.' },
             ],
-            Especial: [
-                { id: 'Carta_UltimaVoluntad_CorreoPrime', rareza: 'raro', niveles: [3], desc: 'Envía inventario al morir.' },
-                { id: 'Carta_UltimaVoluntad_CorreoPrime', rareza: 'epico', niveles: [4, 5], desc: 'Envía inventario al morir.' },
-            ]
         };
 
         const RAREZA_PROBABILIDAD = { 'comun': 0.60, 'raro': 0.30, 'epico': 0.10 };
@@ -745,8 +796,8 @@
             mapGrid = new Array(49).fill(null);
             // Nivel 1 siempre fijo
             const sysName = 'Sistema_Tierra';
-            const planetStates = { 'Planeta_Tierra_Base': { shops: 0, eventObjects: 0, eventPortals: 0, eventNegative: 0 } };
-            mapGrid[24] = { systemName: sysName, level: 1, planetStates: planetStates };
+            const planetStates = { 'Planeta_Tierra_Base': { shops: 0, eventObjects: 0, eventPortals: 0, eventNegative: 0, rebel: 0, garbage: 0 } };
+            mapGrid[24] = { systemName: sysName, level: 1, planetStates: planetStates, systemDanger: false, systemInfected: false };
             renderMap();
         }
 
@@ -769,9 +820,11 @@
                         planetStates[p] = { shops: 0, eventObjects: 0, eventPortals: 0, eventNegative: 0 };
                     });
                     
-                    mapGrid[pickedSlots[i]] = { 
+                        mapGrid[pickedSlots[i]] = { 
                         systemName: sysName, 
                         level: 5, 
+                        systemDanger: false,
+                        systemInfected: false,
                         planetStates: planetStates 
                     };
                 }
@@ -783,12 +836,14 @@
                         const planetas = SYSTEM_PLANET_RELATION[sysName] || [];
                         const planetStates = {};
                         planetas.forEach(p => {
-                            planetStates[p] = { shops: 0, eventObjects: 0, eventPortals: 0, eventNegative: 0 };
+                            planetStates[p] = { shops: 0, eventObjects: 0, eventPortals: 0, eventNegative: 0, rebel: 0, garbage: 0 };
                         });
 
                         mapGrid[slots[i]] = { 
                             systemName: sysName, 
                             level: level, 
+                            systemDanger: false,
+                            systemInfected: false,
                             planetStates: planetStates
                         };
                     }
@@ -1032,13 +1087,16 @@
                     // Planets Nodes
                     let nodesHTML = '';
                     nodes.forEach(p => {
-                        const pState = data.planetStates && data.planetStates[p.id] ? data.planetStates[p.id] : { shops:0, eventObjects:0, eventPortals:0, eventNegative:0 };
+                        const pState = data.planetStates && data.planetStates[p.id] ? data.planetStates[p.id] : { shops:0, eventObjects:0, eventPortals:0, eventNegative:0, rebel:0, garbage:0 };
                         
                         let badges = '';
                         if(pState.shops > 0) badges += `<div class="planet-badge badge-shop">${pState.shops}</div>`;
                         if(pState.eventObjects > 0) badges += `<div class="planet-badge badge-event">!</div>`;
                         if(pState.eventPortals > 0) badges += `<div class="planet-badge badge-portal">P</div>`;
-                        if(pState.eventNegative > 0) badges += `<div class="planet-badge badge-danger">X</div>`;
+                        if(pState.rebel > 0) badges += `<div class="planet-badge badge-danger" style="background-color:#ef4444">R</div>`;
+                        if(pState.garbage > 0) badges += `<div class="planet-badge badge-danger" style="background-color:#f97316">B</div>`;
+                        // Evento personal u otros
+                        if(pState.eventNegative > 0 && pState.rebel === 0 && pState.garbage === 0) badges += `<div class="planet-badge badge-danger">X</div>`;
 
                         nodesHTML += `
                             <div class="planet-node active-node" style="left: ${p.x}%; top: ${p.y}%;" title="${p.id}">
@@ -1050,6 +1108,7 @@
                     cell.innerHTML = `
                         <div class="system-container">
                             ${data.systemDanger ? '<div class="system-danger-overlay"></div>' : ''}
+                            ${data.systemInfected ? '<div class="system-infected-overlay"></div>' : ''}
                             ${svgHTML}
                             ${nodesHTML}
                             <div class="system-label-overlay">${data.systemName.replace('Sistema_', '').replace(/_/g, ' ')}</div>
@@ -1067,7 +1126,7 @@
             if(!confirm("¿Seguro que quieres reiniciar?")) return;
             nivelActual = 1;
             faseJuego = 'EXPANSION';
-            turnosParaBigCrunch = 1;
+            turnosParaBigCrunch = 2;
             initMap(); // Reset map
             updateUIState();
             
@@ -1323,12 +1382,15 @@
             // Reset previous event markers
             mapGrid.forEach(c => { 
                 if(c) {
-                    c.systemDanger = false; // Reset flag
+                    c.systemDanger = false; 
+                    c.systemInfected = false;
                     if (c.planetStates) {
                         Object.values(c.planetStates).forEach(st => {
                             st.eventObjects = 0; 
                             st.eventPortals = 0; 
-                            st.eventNegative = 0; 
+                            st.eventNegative = 0;
+                            st.rebel = 0;
+                            st.garbage = 0;
                         });
                     }
                 }
@@ -1336,7 +1398,6 @@
             
             let sistemasActivos = [];
             let planetasActivos = [];
-            // Usar mapGrid para determinar que esta activo realmente
             mapGrid.forEach(cell => {
                 if (cell) {
                      const planets = SYSTEM_PLANET_RELATION[cell.systemName];
@@ -1345,30 +1406,30 @@
                 }
             });
 
-            // Filtrar Nivel 1
             if (nivelActual === 1) {
                 out.innerHTML = "<p class='text-gray-400 text-center text-sm'>No hay eventos en el Nivel 1.</p>";
                 renderMap();
                 return;
             }
 
-            // 1. POSITIVO
-            let positiveEventHTML = '';
-            const isPortal = Math.random() < 0.25; 
+            let eventsHTML = '';
+
+            // 1. POSITIVO (Siempre 1)
+            // Portales 40%, Objetos 60%
+            const isPortal = Math.random() < 0.40; 
+            
             if (isPortal) {
                 const targets = shuffleArray(planetasActivos).slice(0, Math.random() < 0.5 ? 2 : 3);
-                
-                // Mark Portals on Map
                 targets.forEach(target => {
                     const sysName = PLANET_TO_SYSTEM_MAP[target];
                     const cellIndex = mapGrid.findIndex(c => c && c.systemName === sysName);
                     if (cellIndex !== -1 && mapGrid[cellIndex].planetStates) {
-                        if (!mapGrid[cellIndex].planetStates[target]) mapGrid[cellIndex].planetStates[target] = {shops:0, eventObjects:0, eventPortals:0, eventNegative:0};
+                        if (!mapGrid[cellIndex].planetStates[target]) mapGrid[cellIndex].planetStates[target] = {shops:0, eventObjects:0, eventPortals:0, eventNegative:0, rebel:0, garbage:0};
                         mapGrid[cellIndex].planetStates[target].eventPortals = 1;
                     }
                 });
 
-                positiveEventHTML = `
+                eventsHTML += `
                     <div class="event-card event-positive">
                         <div class="event-section-title text-green-400">
                             <i data-lucide="door-open" class="w-4 h-4"></i> PORTAL
@@ -1378,18 +1439,24 @@
                 `;
             } else {
                 const targetPlanet = getRandomElement(planetasActivos);
-                const randomObj = getRandomElement(EVENTO_OBJETOS_POOL);
-                const cardHTML = createItemCardHTML(randomObj, true); // Compact
+                let randomObj;
+                // 10% prob de Potencia 3
+                if (Math.random() < 0.10) {
+                    randomObj = getRandomElement(POTENCIA_3_POOL);
+                } else {
+                    randomObj = getRandomElement(EVENTO_OBJETOS_POOL);
+                }
+
+                const cardHTML = createItemCardHTML(randomObj, true);
                 
-                // Update Map Grid for Event
                 const sysName = PLANET_TO_SYSTEM_MAP[targetPlanet];
                 const cellIndex = mapGrid.findIndex(c => c && c.systemName === sysName);
                 if (cellIndex !== -1 && mapGrid[cellIndex].planetStates) {
-                    if (!mapGrid[cellIndex].planetStates[targetPlanet]) mapGrid[cellIndex].planetStates[targetPlanet] = {shops:0, eventObjects:0, eventPortals:0, eventNegative:0};
+                    if (!mapGrid[cellIndex].planetStates[targetPlanet]) mapGrid[cellIndex].planetStates[targetPlanet] = {shops:0, eventObjects:0, eventPortals:0, eventNegative:0, rebel:0, garbage:0};
                     mapGrid[cellIndex].planetStates[targetPlanet].eventObjects++;
                 }
 
-                positiveEventHTML = `
+                eventsHTML += `
                     <div class="event-card event-positive">
                         <div class="event-section-title text-green-400">
                             <i data-lucide="gift" class="w-4 h-4"></i> OBJETO
@@ -1400,62 +1467,96 @@
                 `;
             }
 
-            // 2. NEGATIVOS
-            let negativeEventsHTML = '';
-            const eventosNegativosPool = shuffleArray(EVENTOS_NEGATIVOS);
-            for(let i=0; i<2; i++) {
-                const ev = eventosNegativosPool[i];
-                let titulo = ev.replace(/_/g, ' ');
+            // --- 2. EVENTO PERSONAL (SIEMPRE) ---
+            let pEventBase;
+            const randP = Math.random();
+            if (randP < 0.10) {
+                 pEventBase = EVENTOS_PERSONALES_POOL.find(e => e.id === 'Interferencias');
+            } else {
+                 const commons = EVENTOS_PERSONALES_POOL.filter(e => e.rareza !== 'epico');
+                 pEventBase = getRandomElement(commons);
+            }
+            
+            // Determinar rol afectado (50% Explorador, 50% Comerciante)
+            const rolAfectado = Math.random() < 0.5 ? "EXPLORADOR" : "COMERCIANTE";
+            const pDesc = pEventBase.desc.replace('{ROLE}', rolAfectado);
+            
+            eventsHTML += `
+                <div class="event-card bg-orange-900/20 border-l-4 border-orange-500">
+                    <div class="event-section-title text-orange-400">
+                        <i data-lucide="user-x" class="w-4 h-4"></i> ${pEventBase.id.replace(/_/g, ' ')}
+                    </div>
+                    <p class="text-xs text-gray-300 leading-relaxed">${pDesc}</p>
+                </div>
+            `;
+
+            // Función Helper para Negativo General
+            function generateNegativeGeneralHTML() {
+                // 50% Sistema, 50% Planeta
+                let evType = Math.random() < 0.5 ? 'SISTEMA' : 'PLANETA';
+                let evName = '';
+                
+                if (evType === 'SISTEMA') {
+                    // 75% Infectado, 25% Explosion
+                    evName = Math.random() < 0.75 ? 'Evento_Sistema_Infectado' : 'Evento_Explosion_Sistema';
+                } else {
+                    // Planeta: Basura, Rebelde
+                    evName = getRandomElement(EVENTOS_NEGATIVOS_PLANETA);
+                }
+
+                let titulo = evName.replace(/_/g, ' ');
                 let desc = "";
                 let icon = "alert-octagon";
-                
-                // Targets
+                let styleClass = "event-negative";
                 let targetSysName = null;
                 let targetPlanetName = null; 
 
-                if (ev === 'Evento_Explosion_Sistema') {
-                    const target = getRandomElement(sistemasActivos); // system
+                if (evName === 'Evento_Explosion_Sistema') {
+                    // Filtrar Sistema Tierra
+                    let validTargets = sistemasActivos.filter(s => s !== 'Sistema_Tierra');
+                    if(validTargets.length === 0) validTargets = sistemasActivos; // Fallback raro
+                    
+                    const target = getRandomElement(validTargets); 
                     targetSysName = target;
                     desc = `Sistema <strong class="text-white">${target.replace('Sistema_','')}</strong> explotará.`;
                     icon = "flame";
-                } else if (ev === 'Evento_Sistema_Infectado') {
-                    const target = getRandomElement(sistemasActivos); // system
+                } else if (evName === 'Evento_Sistema_Infectado') {
+                    const target = getRandomElement(sistemasActivos); 
                     targetSysName = target;
                     desc = `Sistema <strong class="text-white">${target.replace('Sistema_','')}</strong> infectado (Daño 1/turno).`;
-                    icon = "skull";
-                } else if (ev === 'Evento_Basura Espacial') {
-                    const target = getRandomElement(planetasActivos); // planet
+                    icon = "skull"; 
+                } else if (evName === 'Evento_Basura Espacial') {
+                    const target = getRandomElement(planetasActivos); 
                     targetSysName = PLANET_TO_SYSTEM_MAP[target];
                     targetPlanetName = target;
-                    desc = `Basura en <strong class="text-white">${target}</strong> (Daño 1).`;
+                    desc = `Basura en <strong class="text-white">${target}</strong> (Daño 2).`;
                     icon = "satellite";
-                } else { 
-                    const target = getRandomElement(planetasActivos); // planet
+                } else if (evName === 'Planeta_Rebelde') { 
+                    const target = getRandomElement(planetasActivos); 
                     targetSysName = PLANET_TO_SYSTEM_MAP[target];
                     targetPlanetName = target;
                     desc = `Rebelión en <strong class="text-white">${target}</strong> (Daño 1).`;
                     icon = "shield-alert";
                 }
 
-                // Update Map Grid for Negative Event
+                // Update Map
                 if (targetSysName) {
                     const cellIndex = mapGrid.findIndex(c => c && c.systemName === targetSysName);
                     if (cellIndex !== -1 && mapGrid[cellIndex].planetStates) {
-                        // Si es evento de sistema, marcar LA CELDA ENTERA
-                        if (ev === 'Evento_Explosion_Sistema' || ev === 'Evento_Sistema_Infectado') {
-                             mapGrid[cellIndex].systemDanger = true; // Nueva bandera
-                        } else {
-                            // Evento de un solo planeta
-                            if (targetPlanetName) {
-                                if (!mapGrid[cellIndex].planetStates[targetPlanetName]) mapGrid[cellIndex].planetStates[targetPlanetName] = {shops:0, eventObjects:0, eventPortals:0, eventNegative:0};
-                                mapGrid[cellIndex].planetStates[targetPlanetName].eventNegative++;
-                            }
+                        if (evName === 'Evento_Explosion_Sistema') {
+                             mapGrid[cellIndex].systemDanger = true;
+                        } else if (evName === 'Evento_Sistema_Infectado') {
+                             mapGrid[cellIndex].systemInfected = true;
+                        } else if (targetPlanetName) {
+                            if (!mapGrid[cellIndex].planetStates[targetPlanetName]) mapGrid[cellIndex].planetStates[targetPlanetName] = {shops:0, eventObjects:0, eventPortals:0, eventNegative:0, rebel:0, garbage:0};
+                            if (evName === 'Planeta_Rebelde') mapGrid[cellIndex].planetStates[targetPlanetName].rebel = 1;
+                            else if (evName === 'Evento_Basura Espacial') mapGrid[cellIndex].planetStates[targetPlanetName].garbage = 1;
                         }
                     }
                 }
 
-                negativeEventsHTML += `
-                    <div class="event-card event-negative">
+                return `
+                    <div class="event-card ${styleClass}">
                         <div class="event-section-title text-red-400">
                             <i data-lucide="${icon}" class="w-4 h-4"></i> ${titulo}
                         </div>
@@ -1464,8 +1565,19 @@
                 `;
             }
 
-            out.innerHTML = positiveEventHTML + negativeEventsHTML;
-            renderMap(); // Re-render map to show event badges
+            // --- 3. EVENTOS NEGATIVOS GENERALES (SIEMPRE 2) ---
+            eventsHTML += generateNegativeGeneralHTML();
+            eventsHTML += generateNegativeGeneralHTML();
+
+            // --- 4. EVENTO EXTRA (50%) ---
+            if (Math.random() < 0.50) {
+                eventsHTML += `<div class="text-xs text-center text-yellow-500 font-bold uppercase tracking-widest my-1 border-t border-b border-yellow-900 py-1">¡EVENTO EXTRA!</div>`;
+                // Generamos uno negativo general extra
+                eventsHTML += generateNegativeGeneralHTML();
+            }
+
+            out.innerHTML = eventsHTML;
+            renderMap(); 
             lucide.createIcons();
         }
 
