@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Big Crunch Assistant App</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="Asistente de Tablero para el juego de mesa Big Crunch">
+    <meta name="theme-color" content="#1f6feb">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Big Crunch">
+    
+    <!-- Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Icons (temporal - puedes crear iconos reales después) -->
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    
+    <!-- Carga de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- Iconos Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* TEMA ESPACIAL OSCURO MEJORADO */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0b0e14; /* Fondo muy oscuro */
+            background-image: radial-gradient(circle at 50% 0%, #1c2333 0%, #0b0e14 70%);
+            color: #c9d1d9;
+        }
+        
+        h1, h2, .font-tech {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* TARJETAS CON EFECTO DE CRISTAL/PROFUNIDAD */
+        .card {
+            background-color: rgba(22, 27, 34, 0.95);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid #30363d;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-3px);
+            border-color: #58a6ff;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+        }
+
+        /* BOTONES PERSONALIZADOS */
+        .btn {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .btn:active {
+            transform: scale(0.98);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #1f6feb 0%, #1a56db 100%);
+            border: 1px solid #388bfd;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #388bfd 0%, #1f6feb 100%);
+            box-shadow: 0 0 15px rgba(56, 139, 253, 0.4);
+        }
+
+        .btn-secondary {
+            background-color: #21262d;
+            border: 1px solid #30363d;
+        }
+        .btn-secondary:hover {
+            background-color: #30363d;
+            border-color: #8b949e;
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #da3633 0%, #b62324 100%);
+            border: 1px solid #f85149;
+        }
+        .btn-danger:hover {
+            box-shadow: 0 0 15px rgba(218, 54, 51, 0.4);
+        }
+
+        /* CAJAS DE TEXTO/RESULTADOS */
+        .output-box {
+            background-color: #0d1117;
+            border: 1px solid #30363d;
+            font-family: 'Courier New', monospace;
+            line-height: 1.6;
+        }
+
+        /* OBJETIVO 15MW */
+        .goal-display {
+            background: linear-gradient(90deg, #2e1065 0%, #000000 100%);
+            border: 2px solid #a855f7;
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+            text-shadow: 0 0 10px #a855f7;
+        }
+
+        /* RAREZAS DE ITEMS (ESTÉTICA) */
+        .rarity-tag {
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: inline-block;
+            margin-left: auto;
+        }
+        .rarity-comun {
+            background-color: #30363d;
+            color: #8b949e; /* Gris */
+            border: 1px solid #6e7681;
+        }
+        .rarity-raro {
+            background-color: #0c2d6b; /* Azul oscuro fondo */
+            color: #58a6ff; /* Azul brillante texto */
+            border: 1px solid #1f6feb;
+        }
+        .rarity-epico {
+            background-color: #2e1a4d; /* Lila oscuro fondo */
+            color: #d2a8ff; /* Lila brillante texto */
+            border: 1px solid #bc8cff;
+            box-shadow: 0 0 5px rgba(188, 140, 255, 0.2);
+        }
+
+        /* ANIMACIÓN BIG CRUNCH */
+        @keyframes crunchPulse {
+            0% { border-color: #da3633; box-shadow: 0 0 0 0 rgba(218, 54, 51, 0.4); }
+            50% { border-color: #f85149; box-shadow: 0 0 20px 5px rgba(218, 54, 51, 0.2); }
+            100% { border-color: #da3633; box-shadow: 0 0 0 0 rgba(218, 54, 51, 0.4); }
+        }
+        .crunch-mode {
+            animation: crunchPulse 2s infinite;
+        }
+
+        /* Estilos específicos para eventos */
+        .event-section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .event-card {
+            border-left-width: 4px;
+            padding: 0.75rem;
+            background: rgba(0,0,0,0.3);
+            border-radius: 0 0.5rem 0.5rem 0;
+            margin-bottom: 0.75rem;
+        }
+        
+        .event-positive {
+            border-left-color: #3fb950; /* Verde */
+            background: linear-gradient(90deg, rgba(63, 185, 80, 0.1) 0%, transparent 100%);
+        }
+        
+        .event-negative {
+            border-left-color: #da3633; /* Rojo */
+            background: linear-gradient(90deg, rgba(218, 54, 51, 0.1) 0%, transparent 100%);
+        }
+
+        /* Item dentro de evento */
+        .event-item-preview {
+            transform: scale(0.95);
+            transform-origin: left top;
+            margin-top: 0.5rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            max-width: 300px;
+        }
+        
+        /* MAPA VISUAL GRID */
+        .map-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            aspect-ratio: 1 / 1;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .map-cell {
+            background-color: rgba(255, 255, 255, 0.03);
+            border: 1px solid transparent;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s;
+        }
+        
+        .map-cell.active {
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+        
+        /* Colores por nivel en el mapa */
+        .cell-lvl-1 { background-color: rgba(255, 255, 255, 0.15); color: white; border: 1px solid white; }
+        .cell-lvl-2 { background-color: rgba(31, 111, 235, 0.2); color: #a5d6ff; border: 1px solid #1f6feb; }
+        .cell-lvl-3 { background-color: rgba(46, 160, 67, 0.2); color: #7ee787; border: 1px solid #2ea043; }
+        .cell-lvl-4 { background-color: rgba(210, 153, 34, 0.2); color: #f2cc60; border: 1px solid #d29922; }
+        .cell-lvl-5 { background-color: rgba(219, 109, 40, 0.2); color: #ffdfb6; border: 1px solid #db6d28; }
+
+        .shop-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background-color: #a371f7;
+            color: white;
+            font-weight: bold;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+            box-shadow: 0 0 5px #a371f7;
+            border: 1px solid white;
+            z-index: 10;
+        }
+        
+        .event-badge {
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            background-color: #3fb950; /* Verde */
+            color: white;
+            font-weight: bold;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+            box-shadow: 0 0 5px #3fb950;
+            border: 1px solid white;
+            z-index: 10;
+        }
+
+        .portal-badge {
+            position: absolute;
+            bottom: -4px;
+            left: -4px;
+            background-color: #0ea5e9; /* Cyan 500 */
+            color: white;
+            font-weight: bold;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+            box-shadow: 0 0 5px #0ea5e9;
+            border: 1px solid white;
+            z-index: 10;
+        }
+        
+        .negative-badge {
+            position: absolute;
+            bottom: -4px;
+            right: -4px;
+            background-color: #ef4444; /* Red 500 */
+            color: white;
+            font-weight: bold;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+            box-shadow: 0 0 5px #ef4444;
+            border: 1px solid white;
+            z-index: 10;
+        }
+        
+        .system-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 3; /* Allow 3 lines */
+            line-clamp: 3;
+            -webkit-box-orient: vertical;
+            line-height: 1; /* Tighter line height */
+            padding: 0 2px;
+            word-wrap: break-word; /* Ensure long words break */
+            hyphens: auto;
+            font-size: 0.55rem; /* Slightly smaller font */
+            width: 100%;
+        }
+
+    </style>
+</head>
+<body class="p-2 sm:p-6 min-h-screen">
+
+    <div class="max-w-6xl mx-auto">
+        
+        <!-- Header con Reset y Objetivo -->
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 border-b border-gray-700 pb-6 gap-6">
+            <div>
+                <h1 class="text-3xl sm:text-4xl font-black text-[#ffcc00] flex items-center gap-3 tracking-tight" style="text-shadow: 0 0 20px rgba(255, 204, 0, 0.2);">
+                    <i data-lucide="rocket" class="w-8 h-8 sm:w-10 sm:h-10"></i>
+                    BIG CRUNCH
+                </h1>
+                <span class="text-sm font-normal text-gray-500 tracking-normal opacity-70 ml-1">Asistente de Tablero v2.0</span>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
+                <!-- OBJETIVO DISPLAY -->
+                <div class="goal-display px-6 py-3 rounded-xl flex items-center justify-center gap-3 text-white w-full sm:w-auto">
+                    <i data-lucide="zap" class="w-6 h-6 text-purple-300 animate-pulse"></i>
+                    <div class="flex flex-col">
+                        <span class="text-xs text-purple-300 font-bold tracking-widest">OBJETIVO FINAL</span>
+                        <span class="text-2xl font-black font-tech">15 MW</span>
+                    </div>
+                </div>
+
+                <button onclick="resetGame()" class="btn btn-danger py-2 px-5 rounded-lg font-bold shadow-lg flex items-center justify-center gap-2 text-sm whitespace-nowrap h-auto">
+                    <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                    REINICIAR
+                </button>
+            </div>
+        </div>
+
+        <!-- Indicador de Nivel -->
+        <div id="level-container" class="card p-6 mb-6 rounded-2xl text-center border-t-4 border-[#1f6feb] relative overflow-hidden">
+            <span id="phase-label" class="text-sm font-bold tracking-widest text-blue-400 uppercase mb-2 block">FASE: EXPANSIÓN UNIVERSAL</span>
+            <div class="flex justify-center items-center gap-4">
+                <span class="text-2xl font-semibold text-gray-400">NIVEL</span>
+                <span id="current-level" class="text-7xl font-black text-white" style="text-shadow: 0 0 30px rgba(255,255,255,0.1);">1</span>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
+            
+            <!-- Left Column: Map & Events -->
+            <div class="lg:col-span-7 flex flex-col gap-6">
+                
+                <!-- Mapa Visual -->
+                <div class="card p-6 rounded-2xl">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold flex items-center gap-2 text-yellow-400">
+                            <i data-lucide="map" class="w-6 h-6"></i>
+                            Mapa Galáctico
+                        </h2>
+                        <button onclick="handleTurnCycle()" id="btn-next-level" class="btn btn-primary py-2 px-4 rounded-lg font-bold text-sm shadow-lg flex items-center gap-2">
+                            <i data-lucide="arrow-right-circle" class="w-4 h-4"></i>
+                            SIGUIENTE TURNO
+                        </button>
+                    </div>
+                    
+                    <div class="flex flex-col md:flex-row gap-6 items-start">
+                        <!-- Grid Container -->
+                        <div class="w-full md:w-2/3 bg-[#05070a] p-4 rounded-xl border border-gray-800 shadow-inner">
+                            <div id="visual-map" class="map-grid">
+                                <!-- Cells injected via JS -->
+                            </div>
+                        </div>
+                        
+                        <!-- Info Panel -->
+                        <div class="w-full md:w-1/3 flex flex-col gap-4">
+                            <div id="map-output" class="text-xs text-gray-400 bg-[#0d1117] p-3 rounded-lg border border-gray-700 h-full">
+                                <p class="font-bold text-yellow-500 mb-1">ESTADO</p>
+                                Nivel 1 Activo.
+                            </div>
+                            
+                            <!-- Shop Generator Button embedded here for context -->
+                            <div class="border-t border-gray-700 pt-4 mt-auto">
+                                <h3 class="text-sm font-bold text-blue-400 mb-2 flex items-center gap-2">
+                                    <i data-lucide="map-pin" class="w-4 h-4"></i> Tiendas
+                                </h3>
+                                <button onclick="generateShopLocations()" class="btn btn-secondary w-full py-2 rounded-lg text-xs font-bold text-gray-300 mb-2">
+                                    UBICAR TIENDAS
+                                </button>
+                                <div id="shop-locations-details" class="text-xs text-gray-500 italic h-auto max-h-60 overflow-y-auto custom-scrollbar">
+                                    Esperando generación...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Eventos -->
+                <div class="card p-6 rounded-2xl">
+                    <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-red-400">
+                        <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+                        3. Eventos de Turno
+                    </h2>
+                    <button onclick="generateEvent()" class="btn btn-danger w-full py-3 rounded-lg font-semibold shadow-md mb-4 bg-opacity-80">
+                        GENERAR 3 EVENTOS
+                    </button>
+                    <div id="event-output" class="bg-[#0d1117] border border-gray-800 p-4 rounded-xl text-sm text-gray-300 flex flex-col gap-2 min-h-[150px]">
+                        <div class="text-center italic text-gray-500 my-auto">Pulsa para generar los eventos...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Shop Inventory -->
+            <div class="lg:col-span-5">
+                <div class="card p-6 rounded-2xl border border-gray-700 h-full flex flex-col">
+                    <div class="flex justify-between items-end mb-4 border-b border-gray-700 pb-4">
+                        <h2 class="text-xl font-bold flex items-center gap-2 text-green-400">
+                            <i data-lucide="shopping-cart" class="w-6 h-6"></i>
+                            Mercado
+                        </h2>
+                        <div class="text-[10px] text-right space-y-1 font-mono text-gray-500">
+                            <div><span class="inline-block w-2 h-2 rounded-full bg-[#30363d] mr-1"></span>Común 60%</div>
+                            <div><span class="inline-block w-2 h-2 rounded-full bg-[#0c2d6b] mr-1"></span>Raro 30%</div>
+                            <div><span class="inline-block w-2 h-2 rounded-full bg-[#2e1a4d] mr-1"></span>Épico 10%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col gap-3 mb-4">
+                        <select id="shop-level-select" class="w-full p-2 rounded-lg bg-[#0d1117] border border-gray-600 text-white text-sm font-bold focus:ring-1 focus:ring-green-500 outline-none">
+                            <option value="" disabled selected>Nivel de Tienda</option>
+                            <option value="2">Nivel 2</option>
+                            <option value="3">Nivel 3</option>
+                            <option value="4">Nivel 4</option>
+                            <option value="5">Nivel 5 (Épico)</option>
+                        </select>
+                        <button onclick="generateShopInventory()" class="btn btn-primary w-full py-2 px-4 rounded-lg font-bold shadow-lg flex justify-center items-center gap-2 bg-gradient-to-r from-green-600 to-teal-600 border-green-500 hover:from-green-500 hover:to-teal-500">
+                            <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                            GENERAR STOCK
+                        </button>
+                    </div>
+
+                    <div id="shop-inventory-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto flex-grow content-start">
+                        <div class="col-span-full text-center py-8 text-gray-500 border border-dashed border-gray-700 rounded-xl text-xs">
+                            Genera la tienda para ver objetos.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // --- CONFIGURACIÓN GLOBAL ---
+        let nivelActual = 1;
+        let faseJuego = 'EXPANSION'; 
+        let turnosParaBigCrunch = 1; 
+        
+        // ESTADO DEL MAPA (7x7 Grid)
+        // Indices 0-48. Center is 24 (Row 3, Col 3).
+        // Estructura: mapGrid[index] = { systemName: string, level: number, shops: number }
+        let mapGrid = new Array(49).fill(null); 
+
+        // --- DATA STRUCTURES ---
+        
+        // Mapeo inverso para busqueda rapida de sistema por planeta
+        const PLANET_TO_SYSTEM_MAP = {};
+
+        const SISTEMAS_POR_NIVEL = {
+            1: { sistemas: ['Sistema_Tierra'], planetas: ['Planeta_Tierra_Base'] },
+            2: {
+                sistemas: ['Sistema_Agua', 'Sistema_Tierra_Elemental', 'Sistema_Viento', 'Sistema_Fuego'],
+                planetas: ['Planeta_Gota', 'Planeta_Olas', 'Planeta_Roca', 'Planeta_Barro', 'Planeta_Botanico', 'Planeta_Torrnado', 'Planeta_Burbuja', 'Planeta_Chispa', 'Planeta_Magma', 'Planeta_Llamas']
+            },
+            3: {
+                sistemas: ['Sistema_Prehistorico', 'Sistema_Medieval', 'Sistema_FarWest', 'Sistema_Futurista'],
+                planetas: ['Planeta_HuevoDino', 'Planeta_Hueso', 'Planeta_Fosil', 'Planeta_Castillo', 'Planeta_Yelmo', 'Planeta_Escudo', 'Planeta_Cadenas', 'Planeta_GorroCowboy', 'Planeta_Dinamita', 'Planeta_Rueda', 'Planeta_Saloon', 'Planeta_PlacaBase', 'Planeta_Neon', 'Planeta_Holograma']
+            },
+            4: {
+                sistemas: ['Sistema_Pizza', 'Sistema_Deporte', 'Sistema_Chuche', 'Sistema_Windows'],
+                planetas: ['Planeta_Queso', 'Planeta_Tomate', 'Planeta_Cebolla', 'Planeta_Pepperoni', 'Planeta_Champiñon', 'Planeta_Futbol', 'Planeta_Basket', 'Planeta_Voley', 'Planeta_Tenis', 'Planeta_Beisbol', 'Planeta_Piruleta', 'Planeta_Chicle', 'Planeta_Gominola', 'Planeta_Nube', 'Planeta_Archivos', 'Planeta_MiPC', 'Planeta_Papelera', 'Planeta_InternetExplorer']
+            },
+            5: {
+                sistemas: ['Sistema_Geometria_Minimalista', 'Sistema_Gemas'],
+                planetas: ['Planeta_Poligono_3', 'Planeta_Poligono_4', 'Planeta_Poligono_5', 'Planeta_Poligono_6', 'Planeta_Poligono_7', 'Planeta_Rubi', 'Planeta_Topacio', 'Planeta_Lapislazuli', 'Planeta_Esmalte', 'Planeta_Diamante']
+            }
+        };
+
+        // Inicializar Mapa Inverso
+        for(let lvl in SISTEMAS_POR_NIVEL) {
+            const sysList = SISTEMAS_POR_NIVEL[lvl].sistemas;
+            const planetList = SISTEMAS_POR_NIVEL[lvl].planetas;
+            // Asumimos que la asignacion de planetas a sistemas es implicita en el orden o bloques? 
+            // El PDF agrupa planetas bajo sistemas. Para simplificar la logica de "En que sistema esta el planeta",
+            // vamos a asignar todos los planetas del nivel a sus sistemas.
+            // Pero espera, el PDF lista "Sistema X -> Planeta A, Planeta B".
+            // Necesito esa asociacion exacta para el mapa.
+            // Voy a reconstruir un mapping manual rapido basado en el PDF para exactitud.
+        }
+        
+        // Mapping exacto manual (PDF 1.2)
+        const SYSTEM_PLANET_RELATION = {
+            'Sistema_Tierra': ['Planeta_Tierra_Base'],
+            'Sistema_Agua': ['Planeta_Gota', 'Planeta_Olas'],
+            'Sistema_Tierra_Elemental': ['Planeta_Roca', 'Planeta_Barro', 'Planeta_Botanico'],
+            'Sistema_Viento': ['Planeta_Torrnado', 'Planeta_Burbuja'],
+            'Sistema_Fuego': ['Planeta_Chispa', 'Planeta_Magma', 'Planeta_Llamas'],
+            'Sistema_Prehistorico': ['Planeta_HuevoDino', 'Planeta_Hueso', 'Planeta_Fosil'],
+            'Sistema_Medieval': ['Planeta_Castillo', 'Planeta_Yelmo', 'Planeta_Escudo', 'Planeta_Cadenas'],
+            'Sistema_FarWest': ['Planeta_GorroCowboy', 'Planeta_Dinamita', 'Planeta_Rueda', 'Planeta_Saloon'],
+            'Sistema_Futurista': ['Planeta_PlacaBase', 'Planeta_Neon', 'Planeta_Holograma'],
+            'Sistema_Pizza': ['Planeta_Queso', 'Planeta_Tomate', 'Planeta_Cebolla', 'Planeta_Pepperoni', 'Planeta_Champiñon'],
+            'Sistema_Deporte': ['Planeta_Futbol', 'Planeta_Basket', 'Planeta_Voley', 'Planeta_Tenis', 'Planeta_Beisbol'],
+            'Sistema_Chuche': ['Planeta_Piruleta', 'Planeta_Chicle', 'Planeta_Gominola', 'Planeta_Nube'],
+            'Sistema_Windows': ['Planeta_Archivos', 'Planeta_MiPC', 'Planeta_Papelera', 'Planeta_InternetExplorer'],
+            'Sistema_Geometria_Minimalista': ['Planeta_Poligono_3', 'Planeta_Poligono_4', 'Planeta_Poligono_5', 'Planeta_Poligono_6', 'Planeta_Poligono_7'],
+            'Sistema_Gemas': ['Planeta_Rubi', 'Planeta_Topacio', 'Planeta_Lapislazuli', 'Planeta_Esmalte', 'Planeta_Diamante']
+        };
+
+        // Llenar PLANET_TO_SYSTEM_MAP
+        for (const [sys, planets] of Object.entries(SYSTEM_PLANET_RELATION)) {
+            planets.forEach(p => PLANET_TO_SYSTEM_MAP[p] = sys);
+        }
+
+        const EVENTOS_NEGATIVOS = ['Evento_Explosion_Sistema', 'Evento_Sistema_Infectado', 'Evento_Basura Espacial', 'Planeta_Rebelde'];
+        const EVENTO_OBJETOS_POOL = [
+            { id: 'Combustible_Lata_Pequeña', tipoObjeto: 'Combustible', rareza: 'comun', desc: '+3 Combustible' },
+            { id: 'Medkit_Pequeño', tipoObjeto: 'Vida', rareza: 'comun', desc: '+2 HP' },
+            { id: 'Estelar_BrilloEstelar', tipoObjeto: 'Potencia', rareza: 'comun', potenciaValor: 1 },
+            { id: 'Oscura_Pozo', tipoObjeto: 'Potencia', rareza: 'comun', potenciaValor: 1 }
+        ];
+
+        const ITEMS_POR_TIPO = {
+            Combustible: [
+                { id: 'Combustible_Lata_Pequeña', rareza: 'comun', niveles: [2, 3, 4, 5], desc: '+3 Combustible' },
+                { id: 'Combustible_Lata_Media', rareza: 'raro', niveles: [3, 4, 5], desc: '+6 Combustible' },
+                { id: 'Combustible_Tanque_Grande', rareza: 'epico', niveles: [4, 5], desc: '+10 Combustible' },
+            ],
+            Vida: [
+                { id: 'Medkit_Pequeño', rareza: 'comun', niveles: [2, 3, 4, 5], desc: '+2 HP' },
+                { id: 'Medkit_Medio', rareza: 'raro', niveles: [3, 4, 5], desc: '+4 HP' },
+                { id: 'Medkit_Grande', rareza: 'epico', niveles: [4, 5], desc: '+6 HP' },
+            ],
+            Potencia: [
+                { id: 'Estelar_BrilloEstelar', rareza: 'comun', niveles: [2, 3, 4, 5], potenciaValor: 1 },
+                { id: 'Estelar_PulsoEstelar', rareza: 'raro', niveles: [3, 4, 5], potenciaValor: 2 },
+                { id: 'Estelar_NucleoEstelar', rareza: 'epico', niveles: [4, 5], potenciaValor: 3 },
+                { id: 'Oscura_Pozo', rareza: 'comun', niveles: [2, 3, 4, 5], potenciaValor: 1 },
+                { id: 'Oscura_OrbitaDensa', rareza: 'raro', niveles: [3, 4, 5], potenciaValor: 2 },
+                { id: 'Oscura_ColapsoGravitacional', rareza: 'epico', niveles: [4, 5], potenciaValor: 3 },
+            ],
+            Habilidad: [
+                { id: 'Habilidad_Estelar_Chispa', rareza: 'raro', niveles: [2, 3], desc: 'ACTIVA: Mueve +1 planeta gratis al comprar Estelar.' },
+                { id: 'Habilidad_Grav_AtraerObjeto', rareza: 'raro', niveles: [3, 4], desc: 'ACTIVA: Atrae objeto (dist 3).' },
+                { id: 'Habilidad_ExpansiónTemporal', rareza: 'raro', niveles: [3, 4], desc: 'ACTIVA: Repite movimiento.' },
+                { id: 'Habilidad_Estelar_Duplicacion', rareza: 'epico', niveles: [4, 5], desc: 'PASIVA: Estelares x2.' },
+                { id: 'Habilidad_Grav_MasaDoble', rareza: 'epico', niveles: [4, 5], desc: 'PASIVA: Gravitatorias x2.' },
+                { id: 'Habilidad_ProtecciónPlanetaria', rareza: 'epico', niveles: [4, 5], desc: 'PASIVA: -1 Daño.' },
+            ],
+            Especial: [
+                { id: 'Carta_UltimaVoluntad_CorreoPrime', rareza: 'raro', niveles: [3], desc: 'Envía inventario al morir.' },
+                { id: 'Carta_UltimaVoluntad_CorreoPrime', rareza: 'epico', niveles: [4, 5], desc: 'Envía inventario al morir.' },
+            ]
+        };
+
+        const RAREZA_PROBABILIDAD = { 'comun': 0.60, 'raro': 0.30, 'epico': 0.10 };
+
+        // --- UTILS ---
+        function getRandomElement(arr) {
+            if (!arr || arr.length === 0) return null;
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+        function shuffleArray(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+        function generateRareza(forcedRarity = null) {
+            if (forcedRarity) return forcedRarity;
+            const rand = Math.random();
+            if (rand < RAREZA_PROBABILIDAD.comun) return 'comun';
+            if (rand < RAREZA_PROBABILIDAD.comun + RAREZA_PROBABILIDAD.raro) return 'raro';
+            return 'epico';
+        }
+
+        // --- MAP LOGIC (7x7) ---
+        // Indices calculados (Row * 7 + Col)
+        // Centro (3,3) = 24
+        const MAP_SLOTS = {
+            1: [24], // Center
+            2: [17, 25, 31, 23], // N(3,2)=17+? No: 2*7+3=17. E(3,4)=25. S(4,3)=31. W(3,2)? No row=3, col=2 -> 23. Correct. (N, E, S, W)
+            3: [16, 18, 32, 30], // NW(2,2)=16. NE(2,4)=18. SE(4,4)=32. SW(4,2)=30. (NW, NE, SE, SW)
+            4: [10, 39, 27, 21], // N2(1,3)=10. S2(5,3)=38? 5*7+3=38. Wait, my math. Row 5, col 3.
+                // Let's verify.
+                // Center 24 = (3,3).
+                // N (-1 y) = (2,3) = 17.
+                // S (+1 y) = (4,3) = 31.
+                // E (+1 x) = (3,4) = 25.
+                // W (-1 x) = (3,2) = 23.
+                // NW (-1,-1) = (2,2) = 16.
+                // NE (-1, 1) = (2,4) = 18.
+                // SW (1, -1) = (4,2) = 30.
+                // SE (1, 1) = (4,4) = 32.
+                // L4 (Dist 2 Cardinal):
+                // N2 (1,3) = 1*7+3 = 10.
+                // S2 (5,3) = 5*7+3 = 38.
+                // E2 (3,5) = 3*7+5 = 26.
+                // W2 (3,1) = 3*7+1 = 22.
+            5: [3, 45, 27, 21] // Dist 3 Cardinal.
+                // N3 (0,3) = 3.
+                // S3 (6,3) = 45.
+                // E3 (3,6) = 27.
+                // W3 (3,0) = 21.
+        };
+        // Fix L4 indices in constant
+        const MAP_SLOTS_FIXED = {
+            1: [24],
+            2: [17, 25, 31, 23], // N, E, S, W
+            3: [16, 18, 32, 30], // NW, NE, SE, SW
+            4: [10, 26, 38, 22], // N, E, S, W
+            5: [3, 27, 45, 21]   // N, E, S, W
+        };
+
+        function initMap() {
+            mapGrid = new Array(49).fill(null);
+            // Nivel 1 siempre fijo
+            mapGrid[24] = { systemName: 'Sistema_Tierra', level: 1, shops: 0, eventObjects: 0, eventPortals: 0, eventNegative: 0 };
+            renderMap();
+        }
+
+        function updateMapForLevel(level) {
+            if (level > 5) return;
+            if (!MAP_SLOTS_FIXED[level]) return;
+
+            const sistemas = shuffleArray(SISTEMAS_POR_NIVEL[level].sistemas);
+            const slots = MAP_SLOTS_FIXED[level];
+
+            // Nivel 5 solo usa 2 slots aleatorios de los 4 disponibles
+            if (level === 5) {
+                const pickedSlots = shuffleArray(slots).slice(0, 2);
+                for(let i=0; i<2; i++) {
+                    mapGrid[pickedSlots[i]] = { systemName: sistemas[i], level: 5, shops: 0, eventObjects: 0, eventPortals: 0, eventNegative: 0 };
+                }
+            } else {
+                // Niveles 2, 3, 4 llenan todos sus slots
+                for(let i=0; i<slots.length; i++) {
+                    if (sistemas[i]) {
+                        mapGrid[slots[i]] = { systemName: sistemas[i], level: level, shops: 0, eventObjects: 0, eventPortals: 0, eventNegative: 0 };
+                    }
+                }
+            }
+            renderMap();
+        }
+
+        function renderMap() {
+            const gridEl = document.getElementById('visual-map');
+            gridEl.innerHTML = '';
+
+            for(let i=0; i<49; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'map-cell';
+                
+                const data = mapGrid[i];
+                if (data) {
+                    cell.classList.add(`cell-lvl-${data.level}`, 'active');
+                    cell.innerHTML = `
+                        ${data.shops > 0 ? `<div class="shop-badge animate-bounce">${data.shops}</div>` : ''}
+                        ${data.eventObjects > 0 ? `<div class="event-badge animate-pulse">${data.eventObjects}</div>` : ''}
+                        ${data.eventPortals > 0 ? `<div class="portal-badge animate-pulse">P</div>` : ''}
+                        ${data.eventNegative > 0 ? `<div class="negative-badge animate-pulse">${data.eventNegative}</div>` : ''}
+                        <span class="system-name">${data.systemName.replace('Sistema_', '').replace(/_/g, ' ')}</span>
+                    `;
+                    // Tooltip-like title
+                    cell.title = `${data.systemName} (Nivel ${data.level})`;
+                }
+
+                gridEl.appendChild(cell);
+            }
+        }
+
+        // --- CORE FUNCTIONS ---
+
+        function resetGame() {
+            if(!confirm("¿Seguro que quieres reiniciar?")) return;
+            nivelActual = 1;
+            faseJuego = 'EXPANSION';
+            turnosParaBigCrunch = 1;
+            initMap(); // Reset map
+            updateUIState();
+            
+            document.getElementById('map-output').innerHTML = "<p class='font-bold text-yellow-500 mb-1'>ESTADO</p>Nivel 1 Reiniciado.";
+            document.getElementById('shop-locations-details').textContent = "Esperando generación...";
+            document.getElementById('event-output').innerHTML = "<div class='text-center italic text-gray-500 my-auto'>Pulsa para generar los eventos...</div>";
+            document.getElementById('shop-inventory-container').innerHTML = '<div class="col-span-full text-center py-8 text-gray-500 border border-dashed border-gray-700 rounded-xl text-xs">Genera la tienda para ver objetos.</div>';
+        }
+
+        function updateUIState() {
+            const levelEl = document.getElementById('current-level');
+            const phaseEl = document.getElementById('phase-label');
+            const container = document.getElementById('level-container');
+            const btn = document.getElementById('btn-next-level');
+
+            levelEl.textContent = nivelActual;
+            container.className = 'card p-6 mb-6 rounded-2xl text-center border-t-4 relative overflow-hidden'; // Reset
+            levelEl.className = 'text-7xl font-black text-white';
+            
+            if (faseJuego === 'EXPANSION') {
+                phaseEl.textContent = 'FASE: EXPANSIÓN UNIVERSAL';
+                phaseEl.className = 'text-sm font-bold tracking-widest text-blue-400 uppercase mb-2 block';
+                container.classList.add('border-[#1f6feb]');
+                btn.innerHTML = '<i data-lucide="arrow-right-circle" class="w-4 h-4"></i> SIGUIENTE TURNO';
+                btn.className = "btn btn-primary py-2 px-4 rounded-lg font-bold text-sm shadow-lg flex items-center gap-2";
+            } else if (faseJuego === 'CUENTA_ATRAS') {
+                phaseEl.textContent = '⚠️ ALERTA: COLAPSO';
+                phaseEl.className = 'text-sm font-bold tracking-widest text-orange-500 uppercase mb-2 block animate-pulse';
+                container.classList.add('border-orange-500');
+                levelEl.className = 'text-7xl font-black text-orange-500';
+                const turnText = turnosParaBigCrunch === 1 ? "1 TURNO" : `${turnosParaBigCrunch} TURNOS`;
+                btn.innerHTML = `<i data-lucide="timer" class="w-4 h-4"></i> CRUNCH EN ${turnText}`;
+                btn.className = "btn btn-danger py-2 px-4 rounded-lg font-bold text-sm shadow-lg flex items-center gap-2 bg-orange-600 border-orange-500";
+            } else if (faseJuego === 'BIG_CRUNCH') {
+                phaseEl.textContent = '🚨 BIG CRUNCH 🚨';
+                phaseEl.className = 'text-sm font-bold tracking-widest text-red-500 uppercase mb-2 block';
+                container.classList.add('crunch-mode', 'border-red-500'); 
+                levelEl.className = 'text-7xl font-black text-red-500';
+                btn.innerHTML = '<i data-lucide="trash-2" class="w-4 h-4"></i> DESTRUIR NIVEL';
+                btn.className = "btn btn-danger py-2 px-4 rounded-lg font-bold text-sm shadow-lg flex items-center gap-2";
+            }
+            lucide.createIcons();
+        }
+
+        function handleTurnCycle() {
+            const mapOutput = document.getElementById('map-output');
+
+            if (faseJuego === 'EXPANSION') {
+                if (nivelActual < 5) {
+                    nivelActual++;
+                    updateMapForLevel(nivelActual); // ACTUALIZAR VISUAL
+                    
+                    let msg = `Nivel ${nivelActual} Desbloqueado.`;
+                    if (nivelActual === 5) {
+                        faseJuego = 'CUENTA_ATRAS';
+                        msg += " ¡BIG CRUNCH INICIADO!";
+                    }
+                    mapOutput.innerHTML = `<p class="font-bold text-green-400 mb-1">EXPANSIÓN</p>${msg}`;
+                    updateUIState();
+                    return;
+                }
+            }
+
+            if (faseJuego === 'CUENTA_ATRAS') {
+                if (turnosParaBigCrunch > 0) {
+                    mapOutput.innerHTML = `<p class="font-bold text-orange-500 mb-1">CUENTA ATRÁS</p>Queda ${turnosParaBigCrunch} turno.`;
+                    turnosParaBigCrunch--;
+                    updateUIState();
+                    return;
+                } else {
+                    faseJuego = 'BIG_CRUNCH';
+                    mapOutput.innerHTML = `<p class="font-bold text-red-500 mb-1">¡IMPACTO!</p>El Nivel 5 ha sido destruido.`;
+                    
+                    // Destruir Nivel 5 del mapa visual
+                    mapGrid.forEach((cell, idx) => { if(cell && cell.level === 5) mapGrid[idx] = null; });
+                    renderMap();
+                    
+                    nivelActual = 4;
+                    updateUIState();
+                    return;
+                }
+            }
+
+            if (faseJuego === 'BIG_CRUNCH') {
+                if (nivelActual > 1) {
+                    // Destruir nivel actual
+                    mapGrid.forEach((cell, idx) => { if(cell && cell.level === nivelActual) mapGrid[idx] = null; });
+                    
+                    mapOutput.innerHTML = `<p class="font-bold text-red-500 mb-1">COLAPSO</p>Nivel ${nivelActual} consumido.`;
+                    nivelActual--;
+                    
+                    if (nivelActual === 1) {
+                         mapOutput.innerHTML += "<br><span class='text-red-300'>¡Vuelta al Nivel 1!</span>";
+                    }
+                    renderMap();
+                    updateUIState();
+                } else {
+                    mapOutput.innerHTML = "Fin del Universo.";
+                }
+            }
+        }
+
+        function generateShopLocations() {
+            const detailOut = document.getElementById('shop-locations-details');
+            
+            // Limpiar shops previos
+            mapGrid.forEach(c => { if(c) c.shops = 0; });
+
+            let planetasActivos = [];
+            for (let n = 2; n <= nivelActual; n++) {
+                if (SISTEMAS_POR_NIVEL[n]) {
+                    planetasActivos = planetasActivos.concat(SISTEMAS_POR_NIVEL[n].planetas);
+                }
+            }
+
+            if (planetasActivos.length === 0) {
+                detailOut.textContent = "Nivel 1: Sin tiendas.";
+                renderMap();
+                return;
+            }
+
+            let numSistemas = 0;
+            mapGrid.forEach(c => { if(c && c.level > 1) numSistemas++; }); // Count active systems > lvl 1
+
+            const minShops = Math.max(1, Math.floor(numSistemas / 2));
+            const shuffledPlanets = shuffleArray([...planetasActivos]);
+            const selectedPlanets = shuffledPlanets.slice(0, minShops);
+
+            // Asignar al mapa
+            let locationListHTML = '<ul class="space-y-1">';
+            
+            selectedPlanets.forEach(planet => {
+                const system = PLANET_TO_SYSTEM_MAP[planet];
+                // Encontrar celda del sistema
+                const cellIndex = mapGrid.findIndex(c => c && c.systemName === system);
+                if (cellIndex !== -1) {
+                    mapGrid[cellIndex].shops++;
+                    locationListHTML += `<li><span class="text-blue-300">${planet}</span> <span class="text-[10px] text-gray-500">(${system.replace('Sistema_', '')})</span></li>`;
+                }
+            });
+            locationListHTML += '</ul>';
+
+            detailOut.innerHTML = locationListHTML;
+            renderMap(); // Re-render to show badges
+        }
+
+        function generateItem(tipo, nivel, forcedRarity = null) {
+            const itemsValidos = ITEMS_POR_TIPO[tipo].filter(item => item.niveles.includes(nivel));
+            if (itemsValidos.length === 0) return null;
+            const rareza = generateRareza(forcedRarity);
+            let candidatos = itemsValidos.filter(i => i.rareza === rareza);
+            if (candidatos.length === 0) candidatos = itemsValidos; 
+            const itemElegido = getRandomElement(candidatos);
+            if (!itemElegido) return null;
+            return { ...itemElegido, tipoObjeto: tipo }; 
+        }
+
+        function createItemCardHTML(item, compact = false) {
+            if (!item) return '';
+            const rarityClass = `rarity-${item.rareza}`;
+            let icon = 'box';
+            let colorText = 'text-gray-300';
+            if(item.tipoObjeto === 'Vida') { icon = 'heart'; colorText = 'text-red-400'; }
+            if(item.tipoObjeto === 'Combustible') { icon = 'flame'; colorText = 'text-orange-400'; }
+            if(item.tipoObjeto === 'Potencia') { icon = 'zap'; colorText = 'text-yellow-400'; }
+            if(item.tipoObjeto === 'Habilidad') { icon = 'star'; colorText = 'text-cyan-400'; }
+            if(item.tipoObjeto === 'Especial') { icon = 'crown'; colorText = 'text-purple-400'; }
+
+            let details = "";
+            if (item.potenciaValor) details += `<span class="text-xs bg-gray-700 px-2 py-1 rounded text-white">Potencia: ${item.potenciaValor}</span>`;
+            if (item.desc) details += `<p class="text-xs text-gray-400 mt-2 italic border-t border-gray-700 pt-1">"${item.desc}"</p>`;
+
+            if (compact) {
+                let compactDetails = "";
+                if (item.potenciaValor) compactDetails += `<div class="mt-1"><span class="text-[10px] bg-gray-800 px-1.5 py-0.5 rounded text-yellow-200 border border-gray-700 inline-block font-mono">⚡ Potencia: ${item.potenciaValor}</span></div>`;
+                if (item.desc) compactDetails += `<p class="text-[10px] text-gray-400 italic mt-1">"${item.desc}"</p>`;
+
+                return `
+                    <div class="event-item-preview p-3 bg-[#0b0e14] border border-gray-700 rounded-xl flex flex-col gap-1">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center gap-2">
+                                <i data-lucide="${icon}" class="w-4 h-4 ${colorText}"></i>
+                                <span class="text-xs font-bold text-white">${item.id.replace(/_/g, ' ')}</span>
+                            </div>
+                            <span class="rarity-tag ${rarityClass} scale-90 origin-right">${item.rareza}</span>
+                        </div>
+                        ${compactDetails}
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="p-3 bg-[#0b0e14] border border-gray-700 rounded-xl flex flex-col gap-2 hover:border-gray-500 transition-colors">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="${icon}" class="w-4 h-4 ${colorText}"></i>
+                            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">${item.tipoObjeto}</span>
+                        </div>
+                        <span class="rarity-tag ${rarityClass}">${item.rareza}</span>
+                    </div>
+                    <div class="font-bold text-xs sm:text-sm text-white leading-tight">
+                        ${item.id.replace(/_/g, ' ')}
+                    </div>
+                    <div class="mt-1">
+                        ${details}
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateShopInventory() {
+            const shopLevel = parseInt(document.getElementById('shop-level-select').value);
+            const container = document.getElementById('shop-inventory-container');
+            if (isNaN(shopLevel)) {
+                container.innerHTML = '<div class="col-span-full text-center text-red-400 font-bold text-sm">¡Selecciona un nivel!</div>';
+                return;
+            }
+            const tiposDisponibles = ['Potencia', 'Habilidad', 'Vida', 'Combustible'];
+            let itemsData = [];
+            for(let i=0; i<4; i++) {
+                const tipoAleatorio = getRandomElement(tiposDisponibles);
+                const item = generateItem(tipoAleatorio, shopLevel);
+                itemsData.push(item);
+            }
+            if (shopLevel === 5) {
+                const hasEpic = itemsData.some(i => i && i.rareza === 'epico');
+                if (!hasEpic) {
+                    const indexToReplace = Math.floor(Math.random() * 4);
+                    const tipoForce = getRandomElement(tiposDisponibles); 
+                    itemsData[indexToReplace] = generateItem(tipoForce, shopLevel, 'epico');
+                }
+            }
+            if (Math.random() < 0.10) {
+                 const especial = generateItem('Especial', shopLevel);
+                 if(especial) itemsData.push(especial); 
+            }
+            container.innerHTML = itemsData.map(item => createItemCardHTML(item)).join('');
+            lucide.createIcons();
+        }
+
+        function generateEvent() {
+            const out = document.getElementById('event-output');
+            out.innerHTML = ''; 
+            
+            // Reset previous event markers
+            mapGrid.forEach(c => { if(c) { c.eventObjects = 0; c.eventPortals = 0; c.eventNegative = 0; } });
+            
+            let sistemasActivos = [];
+            let planetasActivos = [];
+            // Usar mapGrid para determinar que esta activo realmente
+            mapGrid.forEach(cell => {
+                if (cell) {
+                    // Reconstruir planetas activos basado en sistema
+                     // Esto requiere buscar en SYSTEM_PLANET_RELATION
+                     const planets = SYSTEM_PLANET_RELATION[cell.systemName];
+                     if (planets) planetasActivos = planetasActivos.concat(planets);
+                     sistemasActivos.push(cell.systemName);
+                }
+            });
+
+            // Filtrar Nivel 1
+            if (nivelActual === 1) {
+                out.innerHTML = "<p class='text-gray-400 text-center text-sm'>No hay eventos en el Nivel 1.</p>";
+                renderMap();
+                return;
+            }
+
+            // 1. POSITIVO
+            let positiveEventHTML = '';
+            const isPortal = Math.random() < 0.25; 
+            if (isPortal) {
+                const targets = shuffleArray(planetasActivos).slice(0, Math.random() < 0.5 ? 2 : 3);
+                
+                // Mark Portals on Map
+                targets.forEach(target => {
+                    const sysName = PLANET_TO_SYSTEM_MAP[target];
+                    const cellIndex = mapGrid.findIndex(c => c && c.systemName === sysName);
+                    if (cellIndex !== -1) mapGrid[cellIndex].eventPortals = 1;
+                });
+
+                positiveEventHTML = `
+                    <div class="event-card event-positive">
+                        <div class="event-section-title text-green-400">
+                            <i data-lucide="door-open" class="w-4 h-4"></i> PORTAL
+                        </div>
+                        <p class="text-xs text-green-300 font-mono font-bold">${targets.join(' <-> ')}</p>
+                    </div>
+                `;
+            } else {
+                const targetPlanet = getRandomElement(planetasActivos);
+                const randomObj = getRandomElement(EVENTO_OBJETOS_POOL);
+                const cardHTML = createItemCardHTML(randomObj, true);
+                
+                // Update Map Grid for Event
+                const sysName = PLANET_TO_SYSTEM_MAP[targetPlanet];
+                const cellIndex = mapGrid.findIndex(c => c && c.systemName === sysName);
+                if (cellIndex !== -1) {
+                    mapGrid[cellIndex].eventObjects++;
+                }
+
+                positiveEventHTML = `
+                    <div class="event-card event-positive">
+                        <div class="event-section-title text-green-400">
+                            <i data-lucide="gift" class="w-4 h-4"></i> OBJETO
+                        </div>
+                        <p class="text-xs text-gray-300 mb-1">En <strong class="text-white">${targetPlanet}</strong>:</p>
+                        ${cardHTML}
+                    </div>
+                `;
+            }
+
+            // 2. NEGATIVOS
+            let negativeEventsHTML = '';
+            const eventosNegativosPool = shuffleArray(EVENTOS_NEGATIVOS);
+            for(let i=0; i<2; i++) {
+                const ev = eventosNegativosPool[i];
+                let titulo = ev.replace(/_/g, ' ');
+                let desc = "";
+                let icon = "alert-octagon";
+                
+                // Logic to find target system for marker
+                let targetSysName = null;
+
+                if (ev === 'Evento_Explosion_Sistema') {
+                    const target = getRandomElement(sistemasActivos); // is system name
+                    targetSysName = target;
+                    desc = `Sistema <strong class="text-white">${target.replace('Sistema_','')}</strong> explotará (Daño 4).`;
+                    icon = "flame";
+                } else if (ev === 'Evento_Sistema_Infectado') {
+                    const target = getRandomElement(sistemasActivos); // is system name
+                    targetSysName = target;
+                    desc = `Sistema <strong class="text-white">${target.replace('Sistema_','')}</strong> infectado (Daño 1/turno).`;
+                    icon = "skull";
+                } else if (ev === 'Evento_Basura Espacial') {
+                    const target = getRandomElement(planetasActivos); // is planet name
+                    targetSysName = PLANET_TO_SYSTEM_MAP[target];
+                    desc = `Basura en <strong class="text-white">${target}</strong> (Daño 1).`;
+                    icon = "satellite";
+                } else { 
+                    const target = getRandomElement(planetasActivos); // is planet name
+                    targetSysName = PLANET_TO_SYSTEM_MAP[target];
+                    desc = `Rebelión en <strong class="text-white">${target}</strong> (Daño 1).`;
+                    icon = "shield-alert";
+                }
+
+                // Update Map Grid for Negative Event
+                if (targetSysName) {
+                    const cellIndex = mapGrid.findIndex(c => c && c.systemName === targetSysName);
+                    if (cellIndex !== -1) mapGrid[cellIndex].eventNegative++;
+                }
+
+                negativeEventsHTML += `
+                    <div class="event-card event-negative">
+                        <div class="event-section-title text-red-400">
+                            <i data-lucide="${icon}" class="w-4 h-4"></i> ${titulo}
+                        </div>
+                        <p class="text-xs text-gray-300 leading-relaxed">${desc}</p>
+                    </div>
+                `;
+            }
+
+            out.innerHTML = positiveEventHTML + negativeEventsHTML;
+            renderMap(); // Re-render map to show event badges
+            lucide.createIcons();
+        }
+
+        // INIT
+        window.onload = () => {
+            initMap();
+            updateUIState();
+            
+            // Registrar Service Worker para PWA
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/service-worker.js')
+                        .then((registration) => {
+                            console.log('SW registrado:', registration.scope);
+                        })
+                        .catch((error) => {
+                            console.log('SW falló:', error);
+                        });
+                });
+            }
+        };
+
+    </script>
+</body>
+</html>

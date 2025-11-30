@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Big Crunch Assistant App</title>
+    <!-- Carga de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- Iconos Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* TEMA ESPACIAL OSCURO MEJORADO */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0b0e14; /* Fondo muy oscuro */
+            background-image: radial-gradient(circle at 50% 0%, #1c2333 0%, #0b0e14 70%);
+            color: #c9d1d9;
+        }
+        
+        h1, h2, .font-tech {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* TARJETAS CON EFECTO DE CRISTAL/PROFUNIDAD */
+        .card {
+            background-color: rgba(22, 27, 34, 0.95);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid #30363d;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-3px);
+            border-color: #58a6ff;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+        }
+
+        /* BOTONES PERSONALIZADOS */
+        .btn {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .btn:active {
+            transform: scale(0.98);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #1f6feb 0%, #1a56db 100%);
+            border: 1px solid #388bfd;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #388bfd 0%, #1f6feb 100%);
+            box-shadow: 0 0 15px rgba(56, 139, 253, 0.4);
+        }
+
+        .btn-secondary {
+            background-color: #21262d;
+            border: 1px solid #30363d;
+        }
+        .btn-secondary:hover {
+            background-color: #30363d;
+            border-color: #8b949e;
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #da3633 0%, #b62324 100%);
+            border: 1px solid #f85149;
+        }
+        .btn-danger:hover {
+            box-shadow: 0 0 15px rgba(218, 54, 51, 0.4);
+        }
+
+        /* CAJAS DE TEXTO/RESULTADOS */
+        .output-box {
+            background-color: #0d1117;
+            border: 1px solid #30363d;
+            font-family: 'Courier New', monospace;
+            line-height: 1.6;
+        }
+
+        /* OBJETIVO 15MW */
+        .goal-display {
+            background: linear-gradient(90deg, #2e1065 0%, #000000 100%);
+            border: 2px solid #a855f7;
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+            text-shadow: 0 0 10px #a855f7;
+        }
+
+        /* RAREZAS DE ITEMS (ESTÉTICA) */
+        .rarity-tag {
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: inline-block;
+            margin-left: auto;
+        }
+        .rarity-comun {
+            background-color: #30363d;
+            color: #8b949e; /* Gris */
+            border: 1px solid #6e7681;
+        }
+        .rarity-raro {
+            background-color: #0c2d6b; /* Azul oscuro fondo */
+            color: #58a6ff; /* Azul brillante texto */
+            border: 1px solid #1f6feb;
+        }
+        .rarity-epico {
+            background-color: #2e1a4d; /* Lila oscuro fondo */
+            color: #d2a8ff; /* Lila brillante texto */
+            border: 1px solid #bc8cff;
+            box-shadow: 0 0 5px rgba(188, 140, 255, 0.2);
+        }
+
+        /* ANIMACIÓN BIG CRUNCH */
+        @keyframes crunchPulse {
+            0% { border-color: #da3633; box-shadow: 0 0 0 0 rgba(218, 54, 51, 0.4); }
+            50% { border-color: #f85149; box-shadow: 0 0 20px 5px rgba(218, 54, 51, 0.2); }
+            100% { border-color: #da3633; box-shadow: 0 0 0 0 rgba(218, 54, 51, 0.4); }
+        }
+        .crunch-mode {
+            animation: crunchPulse 2s infinite;
+        }
+
+        /* Estilos específicos para eventos */
+        .event-section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .event-card {
+            border-left-width: 4px;
+            padding: 0.75rem;
+            background: rgba(0,0,0,0.3);
+            border-radius: 0 0.5rem 0.5rem 0;
+            margin-bottom: 0.75rem;
+        }
+        
+        .event-positive {
+            border-left-color: #3fb950; /* Verde */
+            background: linear-gradient(90deg, rgba(63, 185, 80, 0.1) 0%, transparent 100%);
+        }
+        
+        .event-negative {
+            border-left-color: #da3633; /* Rojo */
+            background: linear-gradient(90deg, rgba(218, 54, 51, 0.1) 0%, transparent 100%);
+        }
+
+        /* Item dentro de evento */
+        .event-item-preview {
+            transform: scale(0.95);
+            transform-origin: left top;
+            margin-top: 0.5rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            max-width: 300px;
+        }
+    </style>
+</head>
+<body class="p-2 sm:p-6 min-h-screen">
+
+    <div class="max-w-6xl mx-auto">
+        
+        <!-- Header con Reset y Objetivo -->
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 border-b border-gray-700 pb-6 gap-6">
+            <div>
+                <h1 class="text-3xl sm:text-4xl font-black text-[#ffcc00] flex items-center gap-3 tracking-tight" style="text-shadow: 0 0 20px rgba(255, 204, 0, 0.2);">
+                    <i data-lucide="rocket" class="w-8 h-8 sm:w-10 sm:h-10"></i>
+                    BIG CRUNCH
+                </h1>
+                <span class="text-sm font-normal text-gray-500 tracking-normal opacity-70 ml-1">Asistente de Tablero v2.0</span>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
+                <!-- OBJETIVO DISPLAY -->
+                <div class="goal-display px-6 py-3 rounded-xl flex items-center justify-center gap-3 text-white w-full sm:w-auto">
+                    <i data-lucide="zap" class="w-6 h-6 text-purple-300 animate-pulse"></i>
+                    <div class="flex flex-col">
+                        <span class="text-xs text-purple-300 font-bold tracking-widest">OBJETIVO FINAL</span>
+                        <span class="text-2xl font-black font-tech">15 MW</span>
+                    </div>
+                </div>
+
+                <button onclick="resetGame()" class="btn btn-danger py-2 px-5 rounded-lg font-bold shadow-lg flex items-center justify-center gap-2 text-sm whitespace-nowrap h-auto">
+                    <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                    REINICIAR
+                </button>
+            </div>
+        </div>
+
+        <!-- Indicador de Nivel -->
+        <div id="level-container" class="card p-6 mb-6 rounded-2xl text-center border-t-4 border-[#1f6feb] relative overflow-hidden">
+            <span id="phase-label" class="text-sm font-bold tracking-widest text-blue-400 uppercase mb-2 block">FASE: EXPANSIÓN UNIVERSAL</span>
+            <div class="flex justify-center items-center gap-4">
+                <span class="text-2xl font-semibold text-gray-400">NIVEL</span>
+                <span id="current-level" class="text-7xl font-black text-white" style="text-shadow: 0 0 30px rgba(255,255,255,0.1);">1</span>
+            </div>
+        </div>
+
+        <!-- Generador de Mapa/Nivel (Nivel_Sistemas) -->
+        <div class="card p-6 mb-6 rounded-2xl">
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-yellow-400">
+                <i data-lucide="map" class="w-6 h-6"></i>
+                Gestión de Turnos y Niveles
+            </h2>
+            <button id="btn-next-level" onclick="handleTurnCycle()" class="btn btn-primary w-full py-5 rounded-xl font-bold text-xl text-white shadow-xl flex justify-center items-center gap-3">
+                <i data-lucide="arrow-right-circle" class="w-6 h-6"></i>
+                SIGUIENTE TURNO / EXPANDIR
+            </button>
+            <div id="map-output" class="output-box mt-5 p-5 rounded-xl text-sm text-yellow-200 border-l-4 border-yellow-500 bg-[#15120a]">
+                <p class="font-bold mb-2 text-yellow-500">ESTADO INICIAL</p>
+                Partida iniciada. Estamos en Nivel 1 (Tierra). Pulsa el botón para expandir al Nivel 2.
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <!-- Generador de Ubicación de Tiendas -->
+            <div class="card p-6 rounded-2xl flex flex-col h-full">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-blue-400">
+                    <i data-lucide="map-pin" class="w-5 h-5"></i>
+                    1. Ubicación Tiendas
+                </h2>
+                <p class="text-xs text-gray-500 mb-3">1 Tienda por cada 2 sistemas en juego. Ubicación aleatoria dentro del sistema.</p>
+                <button onclick="generateShopLocations()" class="btn btn-secondary w-full py-3 rounded-lg font-semibold shadow-md text-gray-200 mb-4">
+                    Generar Ubicaciones
+                </button>
+                <div id="shop-locations-output" class="output-box flex-grow p-4 rounded-xl text-sm text-gray-300">
+                    Esperando generación...
+                </div>
+            </div>
+
+            <!-- Generador de Eventos (3 EVENTOS: 1 POSITIVO, 2 NEGATIVOS) -->
+            <div class="card p-6 rounded-2xl flex flex-col h-full">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-red-400">
+                    <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+                    3. Eventos de Turno
+                </h2>
+                <p class="text-xs text-gray-500 mb-3">Genera 3 eventos: 1 Positivo (Milagro) y 2 Negativos (Calamidades).</p>
+                <button onclick="generateEvent()" class="btn btn-danger w-full py-3 rounded-lg font-semibold shadow-md mb-4 bg-opacity-80">
+                    GENERAR EVENTOS
+                </button>
+                <div id="event-output" class="output-box flex-grow p-4 rounded-xl text-sm text-gray-300 flex flex-col gap-2 min-h-[200px]">
+                    <div class="text-center italic text-gray-500 my-auto">Pulsa para generar los eventos del turno...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Generador de Inventario de Tienda (SLOT MACHINE) -->
+        <div class="card p-6 rounded-2xl border border-gray-700">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-4 border-b border-gray-700 pb-4 gap-4">
+                <h2 class="text-xl font-bold flex items-center gap-2 text-green-400">
+                    <i data-lucide="shopping-cart" class="w-6 h-6"></i>
+                    2. Mercado Galáctico
+                </h2>
+                <!-- Leyenda de probabilidades -->
+                <div class="text-xs text-right space-y-1 font-mono w-full sm:w-auto">
+                    <div><span class="inline-block w-3 h-3 rounded-full bg-[#30363d] border border-gray-500 mr-1 align-middle"></span>Común 60%</div>
+                    <div><span class="inline-block w-3 h-3 rounded-full bg-[#0c2d6b] border border-blue-500 mr-1 align-middle"></span>Raro 30%</div>
+                    <div><span class="inline-block w-3 h-3 rounded-full bg-[#2e1a4d] border border-purple-500 mr-1 align-middle"></span>Épico 10%</div>
+                </div>
+            </div>
+            
+            <div class="flex flex-col sm:flex-row gap-4 items-center mb-6">
+                <div class="relative w-full flex-grow">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
+                        <i data-lucide="layers" class="w-4 h-4"></i>
+                    </div>
+                    <select id="shop-level-select" class="w-full pl-10 p-3 rounded-xl bg-[#0d1117] border border-gray-600 text-white focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none cursor-pointer appearance-none font-bold">
+                        <option value="" disabled selected>Selecciona Nivel de Tienda</option>
+                        <option value="2">Nivel 2</option>
+                        <option value="3">Nivel 3</option>
+                        <option value="4">Nivel 4</option>
+                        <option value="5">Nivel 5 (¡Objeto Épico Asegurado!)</option>
+                    </select>
+                </div>
+                <button onclick="generateShopInventory()" class="btn btn-primary w-full sm:w-auto py-3 px-8 rounded-xl font-bold shadow-lg flex items-center gap-2 bg-gradient-to-r from-green-600 to-teal-600 border-green-500 hover:from-green-500 hover:to-teal-500">
+                    <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                    GENERAR TIENDA
+                </button>
+            </div>
+
+            <!-- Contenedor de Items (GRID) -->
+            <div id="shop-inventory-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+                <!-- Aquí se inyectarán las tarjetas de items -->
+                <div class="col-span-1 md:col-span-2 xl:col-span-4 text-center py-8 text-gray-500 border border-dashed border-gray-700 rounded-xl">
+                    Selecciona un nivel y genera la tienda para ver los 4 objetos disponibles.
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Inicializar iconos
+        lucide.createIcons();
+
+        // --- ESTADO DEL JUEGO ---
+        let nivelActual = 1;
+        let faseJuego = 'EXPANSION'; 
+        let turnosParaBigCrunch = 1; 
+        
+        // --- DATA STRUCTURES ---
+
+        const SISTEMAS_POR_NIVEL = {
+            2: {
+                sistemas: ['Sistema_Agua', 'Sistema_Tierra_Elemental', 'Sistema_Viento', 'Sistema_Fuego'],
+                planetas: ['Planeta_Gota', 'Planeta_Olas', 'Planeta_Roca', 'Planeta_Barro', 'Planeta_Botanico', 'Planeta_Torrnado', 'Planeta_Burbuja', 'Planeta_Chispa', 'Planeta_Magma', 'Planeta_Llamas']
+            },
+            3: {
+                sistemas: ['Sistema_Prehistorico', 'Sistema_Medieval', 'Sistema_FarWest', 'Sistema_Futurista'],
+                planetas: ['Planeta_HuevoDino', 'Planeta_Hueso', 'Planeta_Fosil', 'Planeta_Castillo', 'Planeta_Yelmo', 'Planeta_Escudo', 'Planeta_Cadenas', 'Planeta_GorroCowboy', 'Planeta_Dinamita', 'Planeta_Rueda', 'Planeta_Saloon', 'Planeta_PlacaBase', 'Planeta_Neon', 'Planeta_Holograma']
+            },
+            4: {
+                sistemas: ['Sistema_Pizza', 'Sistema_Deporte', 'Sistema_Chuche', 'Sistema_Windows'],
+                planetas: ['Planeta_Queso', 'Planeta_Tomate', 'Planeta_Cebolla', 'Planeta_Pepperoni', 'Planeta_Champiñon', 'Planeta_Futbol', 'Planeta_Basket', 'Planeta_Voley', 'Planeta_Tenis', 'Planeta_Beisbol', 'Planeta_Piruleta', 'Planeta_Chicle', 'Planeta_Gominola', 'Planeta_Nube', 'Planeta_Archivos', 'Planeta_MiPC', 'Planeta_Papelera', 'Planeta_InternetExplorer']
+            },
+            5: {
+                sistemas: ['Sistema_Geometria_Minimalista', 'Sistema_Gemas'],
+                planetas: ['Planeta_Poligono_3', 'Planeta_Poligono_4', 'Planeta_Poligono_5', 'Planeta_Poligono_6', 'Planeta_Poligono_7', 'Planeta_Rubi', 'Planeta_Topacio', 'Planeta_Lapislazuli', 'Planeta_Esmalte', 'Planeta_Diamante']
+            }
+        };
+
+        // EVENTOS
+        const EVENTOS_NEGATIVOS = ['Evento_Explosion_Sistema', 'Evento_Sistema_Infectado', 'Evento_Basura Espacial', 'Planeta_Rebelde'];
+        // Eventos positivos: 'Objeto_Aleatorio' (75%) y 'Portal_P1_P2_P3' (25%)
+
+        // OBJETOS ESPECÍFICOS PARA EL EVENTO "Objeto_Aleatorio"
+        const EVENTO_OBJETOS_POOL = [
+            { id: 'Combustible_Lata_Pequeña', tipoObjeto: 'Combustible', rareza: 'comun', desc: '+3 Combustible' },
+            { id: 'Medkit_Pequeño', tipoObjeto: 'Vida', rareza: 'comun', desc: '+2 HP' },
+            { id: 'Estelar_BrilloEstelar', tipoObjeto: 'Potencia', rareza: 'comun', potenciaValor: 1 },
+            { id: 'Oscura_Pozo', tipoObjeto: 'Potencia', rareza: 'comun', potenciaValor: 1 }
+        ];
+
+        // DATABASE DE ITEMS ACTUALIZADA
+        const ITEMS_POR_TIPO = {
+            Combustible: [
+                { id: 'Combustible_Lata_Pequeña', rareza: 'comun', niveles: [2, 3, 4, 5], desc: '+3 Combustible' },
+                { id: 'Combustible_Lata_Media', rareza: 'raro', niveles: [3, 4, 5], desc: '+6 Combustible' },
+                { id: 'Combustible_Tanque_Grande', rareza: 'epico', niveles: [4, 5], desc: '+10 Combustible' },
+            ],
+            Vida: [
+                { id: 'Medkit_Pequeño', rareza: 'comun', niveles: [2, 3, 4, 5], desc: '+2 HP' },
+                { id: 'Medkit_Medio', rareza: 'raro', niveles: [3, 4, 5], desc: '+4 HP' },
+                { id: 'Medkit_Grande', rareza: 'epico', niveles: [4, 5], desc: '+6 HP' },
+            ],
+            Potencia: [
+                // Estelares
+                { id: 'Estelar_BrilloEstelar', rareza: 'comun', niveles: [2, 3, 4, 5], potenciaValor: 1 },
+                { id: 'Estelar_PulsoEstelar', rareza: 'raro', niveles: [3, 4, 5], potenciaValor: 2 },
+                { id: 'Estelar_NucleoEstelar', rareza: 'epico', niveles: [4, 5], potenciaValor: 3 },
+                // Gravitatorias
+                { id: 'Oscura_Pozo', rareza: 'comun', niveles: [2, 3, 4, 5], potenciaValor: 1 },
+                { id: 'Oscura_OrbitaDensa', rareza: 'raro', niveles: [3, 4, 5], potenciaValor: 2 },
+                { id: 'Oscura_ColapsoGravitacional', rareza: 'epico', niveles: [4, 5], potenciaValor: 3 },
+            ],
+            Habilidad: [
+                { id: 'Habilidad_Estelar_Chispa', rareza: 'raro', niveles: [2, 3], desc: 'ACTIVA: Al comprar carta Estelar, mueve +1 planeta siguiente turno sin gastar combustible.' },
+                { id: 'Habilidad_Grav_AtraerObjeto', rareza: 'raro', niveles: [3, 4], desc: 'ACTIVA: Atrae un objeto en el suelo hacia ti desde cualquier lugar (max dist 3).' },
+                { id: 'Habilidad_ExpansiónTemporal', rareza: 'raro', niveles: [3, 4], desc: 'ACTIVA: Repite una acción de movimiento inmediatamente.' },
+                { id: 'Habilidad_Estelar_Duplicacion', rareza: 'epico', niveles: [4, 5], desc: 'PASIVA: Todas las Potencias Estelares valen x2.' },
+                { id: 'Habilidad_Grav_MasaDoble', rareza: 'epico', niveles: [4, 5], desc: 'PASIVA: Todas tus Potencias Gravitatorias valen x2.' },
+                { id: 'Habilidad_ProtecciónPlanetaria', rareza: 'epico', niveles: [4, 5], desc: 'PASIVA: Recibes -1 daño por cualquier evento o efecto en tu loseta/planeta.' },
+            ],
+            Especial: [
+                { id: 'Carta_UltimaVoluntad_CorreoPrime', rareza: 'raro', niveles: [3], desc: 'Al morir, envía inventario a otro jugador.' },
+                { id: 'Carta_UltimaVoluntad_CorreoPrime', rareza: 'epico', niveles: [4, 5], desc: 'Al morir, envía inventario a otro jugador.' },
+            ]
+        };
+
+        const RAREZA_PROBABILIDAD = { 'comun': 0.60, 'raro': 0.30, 'epico': 0.10 };
+
+        // --- UTILITY FUNCTIONS ---
+
+        function getRandomElement(arr) {
+            if (!arr || arr.length === 0) return null;
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function shuffleArray(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function generateRareza(forcedRarity = null) {
+            if (forcedRarity) return forcedRarity;
+            const rand = Math.random();
+            if (rand < RAREZA_PROBABILIDAD.comun) return 'comun';
+            if (rand < RAREZA_PROBABILIDAD.comun + RAREZA_PROBABILIDAD.raro) return 'raro';
+            return 'epico';
+        }
+
+        // --- LOGICA PRINCIPAL ---
+
+        function resetGame() {
+            if(!confirm("¿Seguro que quieres reiniciar la partida desde el principio?")) return;
+            nivelActual = 1;
+            faseJuego = 'EXPANSION';
+            turnosParaBigCrunch = 1; 
+            updateUIState();
+            
+            document.getElementById('map-output').innerHTML = "<p class='font-bold mb-2 text-yellow-500'>ESTADO INICIAL</p>Partida reiniciada. Estamos en Nivel 1. Pulsa para empezar.";
+            document.getElementById('shop-locations-output').textContent = "Esperando generación...";
+            document.getElementById('event-output').innerHTML = "<div class='text-center italic text-gray-500 my-auto'>Pulsa para generar los eventos del turno...</div>";
+            document.getElementById('shop-inventory-container').innerHTML = '<div class="col-span-1 md:col-span-2 xl:col-span-4 text-center py-8 text-gray-500 border border-dashed border-gray-700 rounded-xl">Selecciona un nivel y genera la tienda para ver los 4 objetos disponibles.</div>';
+        }
+
+        function updateUIState() {
+            const levelEl = document.getElementById('current-level');
+            const phaseEl = document.getElementById('phase-label');
+            const container = document.getElementById('level-container');
+            const btn = document.getElementById('btn-next-level');
+
+            levelEl.textContent = nivelActual;
+            
+            // Limpiar clases
+            container.classList.remove('crunch-mode', 'border-red-500', 'border-[#1f6feb]', 'border-orange-500', 'border-t-4');
+            container.classList.add('border-t-4'); // Base styling
+            levelEl.className = 'text-7xl font-black text-white';
+            
+            if (faseJuego === 'EXPANSION') {
+                phaseEl.textContent = 'FASE: EXPANSIÓN UNIVERSAL';
+                phaseEl.className = 'text-sm font-bold tracking-widest text-blue-400 uppercase mb-2 block';
+                container.classList.add('border-[#1f6feb]');
+                btn.innerHTML = '<i data-lucide="arrow-right-circle" class="w-6 h-6"></i> SIGUIENTE TURNO / EXPANDIR';
+                btn.className = "btn btn-primary w-full py-5 rounded-xl font-bold text-xl text-white shadow-xl flex justify-center items-center gap-3";
+            } else if (faseJuego === 'CUENTA_ATRAS') {
+                phaseEl.textContent = '⚠️ ALERTA: COLAPSO INMINENTE ⚠️';
+                phaseEl.className = 'text-sm font-bold tracking-widest text-orange-500 uppercase mb-2 block animate-pulse';
+                container.classList.add('border-orange-500');
+                levelEl.className = 'text-7xl font-black text-orange-500';
+                
+                const turnText = turnosParaBigCrunch === 1 ? "1 TURNO" : `${turnosParaBigCrunch} TURNOS`;
+                btn.innerHTML = `<i data-lucide="timer" class="w-6 h-6"></i> SIGUIENTE TURNO (CRUNCH EN ${turnText})`;
+                btn.className = "btn btn-danger w-full py-5 rounded-xl font-bold text-xl text-white shadow-xl flex justify-center items-center gap-3 bg-orange-600 border-orange-500";
+            } else if (faseJuego === 'BIG_CRUNCH') {
+                phaseEl.textContent = '🚨 FASE: BIG CRUNCH 🚨';
+                phaseEl.className = 'text-sm font-bold tracking-widest text-red-500 uppercase mb-2 block';
+                container.classList.add('crunch-mode', 'border-red-500'); 
+                levelEl.className = 'text-7xl font-black text-red-500';
+                btn.innerHTML = '<i data-lucide="trash-2" class="w-6 h-6"></i> SIGUIENTE TURNO / DESTRUIR NIVEL';
+                btn.className = "btn btn-danger w-full py-5 rounded-xl font-bold text-xl text-white shadow-xl flex justify-center items-center gap-3";
+            }
+            lucide.createIcons();
+        }
+
+        function handleTurnCycle() {
+            const mapOutput = document.getElementById('map-output');
+
+            // 1. FASE EXPANSIÓN
+            if (faseJuego === 'EXPANSION') {
+                if (nivelActual < 5) {
+                    nivelActual++;
+                    let htmlContent = "";
+
+                    // Lógica especial Nivel 5
+                    if (nivelActual === 5) {
+                        faseJuego = 'CUENTA_ATRAS';
+                        
+                        const sistemas = SISTEMAS_POR_NIVEL[5].sistemas; // 2 sistemas
+                        const posiciones = ['ARRIBA', 'ABAJO', 'IZQUIERDA', 'DERECHA'];
+                        const posMezcladas = shuffleArray(posiciones);
+                        
+                        htmlContent = `
+                            <p class="text-orange-400 font-bold mb-2">⚠️ ¡NIVEL 5 ALCANZADO! BIG CRUNCH INCOMING</p>
+                            <ul class="list-disc pl-5 space-y-1 text-gray-300">
+                                <li><strong class="text-white">${sistemas[0]}</strong> se coloca en: <strong class="text-yellow-400">${posMezcladas[0]}</strong></li>
+                                <li><strong class="text-white">${sistemas[1]}</strong> se coloca en: <strong class="text-yellow-400">${posMezcladas[1]}</strong></li>
+                            </ul>
+                            <p class="mt-3 text-sm italic text-gray-400">Solo 2 sistemas colocados. El resto de direcciones quedan vacías.</p>
+                        `;
+                    } else {
+                        // Niveles 2, 3, 4
+                        const sistemas = SISTEMAS_POR_NIVEL[nivelActual].sistemas;
+                        const orden = shuffleArray(sistemas);
+                        
+                        htmlContent = `
+                            <p class="text-green-400 font-bold mb-2">EXPANSIÓN: NIVEL ${nivelActual} DESBLOQUEADO</p>
+                            <p class="mb-2 text-gray-300">Orden de colocación (Empezando Arriba-Izquierda y sentido horario):</p>
+                            <ol class="list-decimal pl-5 space-y-1 text-white font-mono">
+                                ${orden.map(s => `<li>${s}</li>`).join('')}
+                            </ol>
+                        `;
+                    }
+
+                    mapOutput.innerHTML = htmlContent;
+                    updateUIState();
+                    return;
+                }
+            }
+
+            // 2. FASE CUENTA ATRÁS
+            if (faseJuego === 'CUENTA_ATRAS') {
+                if (turnosParaBigCrunch > 0) {
+                    mapOutput.innerHTML = `
+                        <p class="text-orange-500 font-bold text-lg animate-pulse">⏳ CUENTA ATRÁS PARA EL COLAPSO</p>
+                        <p class="mt-2 text-white">Queda <strong class="text-xl">${turnosParaBigCrunch}</strong> turno para el Big Crunch.</p>
+                        <p class="text-sm text-gray-400 mt-2">¡HUID HACIA EL CENTRO!</p>
+                    `;
+                    turnosParaBigCrunch--;
+                    updateUIState();
+                    return;
+                } else {
+                    faseJuego = 'BIG_CRUNCH';
+                    mapOutput.innerHTML = `
+                        <p class="text-red-500 font-black text-xl mb-2">💥 ¡EMPIEZA EL BIG CRUNCH! 💥</p>
+                        <p class="text-white mb-2">EL NIVEL 5 HA SIDO ELIMINADO POR COMPLETO.</p>
+                        <p class="text-gray-400 text-sm">El mapa se reduce a los límites del Nivel 4.</p>
+                    `;
+                    nivelActual = 4;
+                    updateUIState();
+                    return;
+                }
+            }
+
+            // 3. FASE BIG CRUNCH
+            if (faseJuego === 'BIG_CRUNCH') {
+                if (nivelActual > 1) {
+                    mapOutput.innerHTML = `
+                        <p class="text-red-500 font-bold mb-2">💥 DESTRUCCIÓN DE NIVEL</p>
+                        <p class="text-white">El Nivel <strong class="text-red-400">${nivelActual}</strong> ha sido consumido por el vacío.</p>
+                        <p class="text-gray-400 mt-2 text-sm">El mapa se reduce a los límites del Nivel ${nivelActual - 1}.</p>
+                    `;
+                    nivelActual--;
+                    
+                    if (nivelActual === 1) {
+                        mapOutput.innerHTML += `
+                            <div class="mt-4 p-3 bg-red-900/30 border border-red-500 rounded-lg">
+                                <p class="text-white font-bold">💀 ¡HAS VUELTO AL NIVEL 1! 💀</p>
+                                <p class="text-sm text-gray-300">Si no tenéis el escudo activado, es el fin de la partida.</p>
+                            </div>
+                        `;
+                    }
+                    updateUIState();
+                } else {
+                    mapOutput.innerHTML = "<p class='text-gray-400 italic'>El Universo se ha colapsado. Partida finalizada.</p>";
+                }
+            }
+        }
+
+        // --- GENERADOR TIENDAS ---
+        function generateShopLocations() {
+            const out = document.getElementById('shop-locations-output');
+            
+            let planetasActivos = [];
+            let numSistemasActivos = 0;
+
+            for (let n = 2; n <= nivelActual; n++) {
+                if (SISTEMAS_POR_NIVEL[n]) {
+                    planetasActivos = planetasActivos.concat(SISTEMAS_POR_NIVEL[n].planetas);
+                    numSistemasActivos += SISTEMAS_POR_NIVEL[n].sistemas.length;
+                }
+            }
+
+            if (planetasActivos.length === 0) {
+                out.textContent = "No hay planetas suficientes (Estás en Nivel 1).";
+                return;
+            }
+
+            // Regla: 1 tienda por cada 2 sistemas
+            const minShops = Math.max(1, Math.floor(numSistemasActivos / 2));
+            const ubicaciones = [];
+            const disponibles = shuffleArray([...planetasActivos]);
+            
+            for(let i=0; i<minShops && i<disponibles.length; i++) {
+                ubicaciones.push(disponibles[i]);
+            }
+
+            if (ubicaciones.length > 0) {
+                out.innerHTML = `
+                    <p class="text-blue-300 font-bold mb-2">Tiendas abiertas en (${ubicaciones.length}):</p>
+                    <ul class="space-y-2">
+                        ${ubicaciones.map(u => `<li class="flex items-center gap-2"><i data-lucide="map-pin" class="w-4 h-4 text-blue-500"></i> ${u}</li>`).join('')}
+                    </ul>
+                `;
+                lucide.createIcons();
+            } else {
+                out.textContent = "No se generaron tiendas.";
+            }
+        }
+
+        // --- GENERADOR INVENTARIO (SLOT MACHINE) ---
+        function generateItem(tipo, nivel, forcedRarity = null) {
+            const itemsValidos = ITEMS_POR_TIPO[tipo].filter(item => item.niveles.includes(nivel));
+            if (itemsValidos.length === 0) return null;
+
+            const rareza = generateRareza(forcedRarity);
+            let candidatos = itemsValidos.filter(i => i.rareza === rareza);
+            
+            if (candidatos.length === 0) candidatos = itemsValidos; // Fallback
+            
+            const itemElegido = getRandomElement(candidatos);
+            if (!itemElegido) return null;
+
+            return { ...itemElegido, tipoObjeto: tipo }; 
+        }
+
+        function createItemCardHTML(item, compact = false) {
+            if (!item) return '';
+
+            const rarityClass = `rarity-${item.rareza}`; // comun, raro, epico
+            
+            // Icono según tipo
+            let icon = 'box';
+            let colorText = 'text-gray-300';
+            if(item.tipoObjeto === 'Vida') { icon = 'heart'; colorText = 'text-red-400'; }
+            if(item.tipoObjeto === 'Combustible') { icon = 'flame'; colorText = 'text-orange-400'; }
+            if(item.tipoObjeto === 'Potencia') { icon = 'zap'; colorText = 'text-yellow-400'; }
+            if(item.tipoObjeto === 'Habilidad') { icon = 'star'; colorText = 'text-cyan-400'; }
+            if(item.tipoObjeto === 'Especial') { icon = 'crown'; colorText = 'text-purple-400'; }
+
+            let details = "";
+            if (item.potenciaValor) details += `<span class="text-xs bg-gray-700 px-2 py-1 rounded text-white">Potencia: ${item.potenciaValor}</span>`;
+            if (item.desc) details += `<p class="text-xs text-gray-400 mt-2 italic border-t border-gray-700 pt-1">"${item.desc}"</p>`;
+
+            // Compact mode for events
+            if (compact) {
+                let compactDetails = "";
+                if (item.potenciaValor) compactDetails += `<div class="mt-1"><span class="text-[10px] bg-gray-800 px-1.5 py-0.5 rounded text-yellow-200 border border-gray-700 inline-block font-mono">⚡ Potencia: ${item.potenciaValor}</span></div>`;
+                if (item.desc) compactDetails += `<p class="text-[10px] text-gray-400 italic mt-1">"${item.desc}"</p>`;
+
+                return `
+                    <div class="event-item-preview p-3 bg-[#0b0e14] border border-gray-700 rounded-xl flex flex-col gap-1">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center gap-2">
+                                <i data-lucide="${icon}" class="w-4 h-4 ${colorText}"></i>
+                                <span class="text-xs font-bold text-white">${item.id.replace(/_/g, ' ')}</span>
+                            </div>
+                            <span class="rarity-tag ${rarityClass} scale-90 origin-right">${item.rareza}</span>
+                        </div>
+                        ${compactDetails}
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="p-4 bg-[#0b0e14] border border-gray-700 rounded-xl flex flex-col gap-2 hover:border-gray-500 transition-colors">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="${icon}" class="w-5 h-5 ${colorText}"></i>
+                            <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">${item.tipoObjeto}</span>
+                        </div>
+                        <span class="rarity-tag ${rarityClass}">${item.rareza}</span>
+                    </div>
+                    <div class="font-bold text-sm text-white leading-tight">
+                        ${item.id.replace(/_/g, ' ')}
+                    </div>
+                    <div class="mt-1">
+                        ${details}
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateShopInventory() {
+            const shopLevel = parseInt(document.getElementById('shop-level-select').value);
+            const container = document.getElementById('shop-inventory-container');
+
+            if (isNaN(shopLevel)) {
+                container.innerHTML = '<div class="col-span-1 md:col-span-4 text-center text-red-400 font-bold">¡Selecciona un nivel primero!</div>';
+                return;
+            }
+
+            const tiposDisponibles = ['Potencia', 'Habilidad', 'Vida', 'Combustible'];
+            let itemsData = [];
+
+            // 1. Generar 4 items aleatorios (SLOT MACHINE)
+            for(let i=0; i<4; i++) {
+                const tipoAleatorio = getRandomElement(tiposDisponibles);
+                const item = generateItem(tipoAleatorio, shopLevel);
+                itemsData.push(item);
+            }
+
+            // 2. Lógica de Nivel 5: Garantizar Épico
+            if (shopLevel === 5) {
+                const hasEpic = itemsData.some(i => i && i.rareza === 'epico');
+                if (!hasEpic) {
+                    const indexToReplace = Math.floor(Math.random() * 4);
+                    const tipoForce = getRandomElement(tiposDisponibles); 
+                    itemsData[indexToReplace] = generateItem(tipoForce, shopLevel, 'epico');
+                }
+            }
+
+            // 3. Probabilidad Extra de Carta Especial (10%)
+            if (Math.random() < 0.10) {
+                 const especial = generateItem('Especial', shopLevel);
+                 if(especial) itemsData.push(especial); 
+            }
+
+            // 4. Renderizar
+            container.innerHTML = itemsData.map(item => createItemCardHTML(item)).join('');
+            lucide.createIcons();
+        }
+
+        // --- GENERADOR EVENTOS (3 EVENTOS) ---
+        function generateEvent() {
+            const out = document.getElementById('event-output');
+            out.innerHTML = ''; // Limpiar
+            
+            let sistemasActivos = [];
+            let planetasActivos = [];
+            for (let n = 2; n <= nivelActual; n++) {
+                if (SISTEMAS_POR_NIVEL[n]) {
+                    sistemasActivos = sistemasActivos.concat(SISTEMAS_POR_NIVEL[n].sistemas);
+                    planetasActivos = planetasActivos.concat(SISTEMAS_POR_NIVEL[n].planetas);
+                }
+            }
+
+            if (sistemasActivos.length === 0) {
+                out.innerHTML = "<p class='text-gray-400 text-center'>No hay eventos en el Nivel 1.</p>";
+                return;
+            }
+
+            // --- GENERAR 3 EVENTOS (1 Positivo, 2 Negativos) ---
+            
+            // 1. EVENTO POSITIVO
+            let positiveEventHTML = '';
+            const isPortal = Math.random() < 0.25; // 25% Portal, 75% Objeto
+
+            if (isPortal) {
+                const targets = shuffleArray(planetasActivos).slice(0, Math.random() < 0.5 ? 2 : 3);
+                positiveEventHTML = `
+                    <div class="event-card event-positive">
+                        <div class="event-section-title text-green-400">
+                            <i data-lucide="door-open" class="w-4 h-4"></i> PORTAL ABIERTO
+                        </div>
+                        <p class="text-sm text-gray-300 mb-1">Se ha formado un vínculo estable entre:</p>
+                        <p class="text-green-300 font-mono font-bold">${targets.join(' <-> ')}</p>
+                    </div>
+                `;
+            } else {
+                // Objeto Aleatorio en Planeta Aleatorio
+                const targetPlanet = getRandomElement(planetasActivos);
+                const randomObj = getRandomElement(EVENTO_OBJETOS_POOL);
+                const cardHTML = createItemCardHTML(randomObj, true); // Compact
+                
+                positiveEventHTML = `
+                    <div class="event-card event-positive">
+                        <div class="event-section-title text-green-400">
+                            <i data-lucide="gift" class="w-4 h-4"></i> OBJETO ENCONTRADO
+                        </div>
+                        <p class="text-sm text-gray-300">Ha aparecido un objeto en <strong class="text-white">${targetPlanet}</strong>:</p>
+                        ${cardHTML}
+                    </div>
+                `;
+            }
+
+            // 2. EVENTOS NEGATIVOS (2 distintos si es posible)
+            let negativeEventsHTML = '';
+            const eventosNegativosPool = shuffleArray(EVENTOS_NEGATIVOS);
+            
+            // Tomamos 2
+            for(let i=0; i<2; i++) {
+                const ev = eventosNegativosPool[i]; // Tomar distinto siempre que haya 2 tipos
+                let titulo = ev.replace(/_/g, ' ');
+                let desc = "";
+                let icon = "alert-octagon";
+
+                if (ev === 'Evento_Explosion_Sistema') {
+                    const target = getRandomElement(sistemasActivos);
+                    desc = `El sistema <strong class="text-white">${target}</strong> se desestabiliza. Explotará el próximo turno (Daño 4).`;
+                    icon = "flame";
+                } else if (ev === 'Evento_Sistema_Infectado') {
+                    const target = getRandomElement(sistemasActivos);
+                    desc = `El sistema <strong class="text-white">${target}</strong> infectado. Recibes 1 daño/turno si permaneces en él.`;
+                    icon = "skull";
+                } else if (ev === 'Evento_Basura Espacial') {
+                    const target = getRandomElement(planetasActivos);
+                    desc = `Nube de escombros en <strong class="text-white">${target}</strong>. Al pasar/entrar -> 1 Daño.`;
+                    icon = "satellite";
+                } else { // Planeta Rebelde
+                    const target = getRandomElement(planetasActivos);
+                    desc = `Levantamiento en <strong class="text-white">${target}</strong>. Al pasar/entrar -> 1 Daño.`;
+                    icon = "shield-alert";
+                }
+
+                negativeEventsHTML += `
+                    <div class="event-card event-negative">
+                        <div class="event-section-title text-red-400">
+                            <i data-lucide="${icon}" class="w-4 h-4"></i> ${titulo}
+                        </div>
+                        <p class="text-sm text-gray-300 leading-relaxed">${desc}</p>
+                    </div>
+                `;
+            }
+
+            // Render Final
+            out.innerHTML = positiveEventHTML + negativeEventsHTML;
+            lucide.createIcons();
+        }
+
+        // Init
+        window.onload = updateUIState;
+
+    </script>
+</body>
+</html>
