@@ -457,6 +457,69 @@
 
         </div>
 
+        <!-- Sección de Instrucciones -->
+        <div class="card p-6 rounded-2xl mt-6 border-t-4 border-cyan-500">
+            <h2 class="text-2xl font-bold mb-4 flex items-center gap-2 text-cyan-400">
+                <i data-lucide="book-open" class="w-6 h-6"></i>
+                Instrucciones y Conceptos Clave
+            </h2>
+            
+            <div class="space-y-4 text-sm text-gray-300">
+                <!-- Orden de Turno -->
+                <div class="bg-[#0d1117] p-4 rounded-lg border-l-4 border-blue-500">
+                    <h3 class="font-bold text-blue-400 mb-2 flex items-center gap-2">
+                        <i data-lucide="list-ordered" class="w-4 h-4"></i>
+                        Orden de Turno
+                    </h3>
+                    <ol class="list-decimal list-inside space-y-1 ml-2 text-gray-300">
+                        <li><strong class="text-white">Pasar al siguiente nivel:</strong> Usa el botón "SIGUIENTE TURNO" para avanzar de nivel.</li>
+                        <li><strong class="text-white">Generar tiendas:</strong> Ubica las tiendas en el mapa usando "UBICAR TIENDAS".</li>
+                        <li><strong class="text-white">Turno del jugador:</strong> Realiza tus acciones (movimiento, compras, etc.).</li>
+                        <li><strong class="text-white">Eventos:</strong> Al final del turno, clica "GENERAR 3 EVENTOS". <span class="text-red-400 font-semibold">⚠️ El daño de los eventos se aplica inmediatamente al generar los eventos.</span></li>
+                    </ol>
+                </div>
+
+                <!-- Daño de Eventos -->
+                <div class="bg-[#0d1117] p-4 rounded-lg border-l-4 border-red-500">
+                    <h3 class="font-bold text-red-400 mb-2 flex items-center gap-2">
+                        <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+                        Daño de Eventos
+                    </h3>
+                    <ul class="list-disc list-inside space-y-1 ml-2 text-gray-300">
+                        <li><strong class="text-white">Eventos negativos:</strong> Si estás en el sistema/planeta afectado cuando se generan los eventos, recibes el daño inmediatamente.</li>
+                        <li><strong class="text-white">Excepción - Daño al pasar:</strong> Los únicos casos donde recibes daño fuera de la generación de eventos son:
+                            <ul class="list-circle list-inside ml-4 mt-1 space-y-1">
+                                <li><strong class="text-yellow-400">Planeta Rebelde:</strong> -1 de daño a 1 rango (al pasar por él).</li>
+                                <li><strong class="text-yellow-400">Basura Espacial:</strong> -1 de daño (al pasar por él).</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Portales -->
+                <div class="bg-[#0d1117] p-4 rounded-lg border-l-4 border-green-500">
+                    <h3 class="font-bold text-green-400 mb-2 flex items-center gap-2">
+                        <i data-lucide="door-open" class="w-4 h-4"></i>
+                        Portales
+                    </h3>
+                    <p class="text-gray-300 ml-2">
+                        <strong class="text-white">Pasar por un portal NO cuenta como movimiento del personaje</strong>, pero <strong class="text-orange-400">gastas 1 de combustible</strong> al usarlo.
+                    </p>
+                </div>
+
+                <!-- Explosión de Sistema -->
+                <div class="bg-[#0d1117] p-4 rounded-lg border-l-4 border-orange-500">
+                    <h3 class="font-bold text-orange-400 mb-2 flex items-center gap-2">
+                        <i data-lucide="flame" class="w-4 h-4"></i>
+                        Explosión de Sistema
+                    </h3>
+                    <p class="text-gray-300 ml-2">
+                        Cuando un sistema planetario explota, <strong class="text-white">ya no se puede pasar por ahí</strong> a menos que tengas la habilidad <strong class="text-cyan-400">Llave Temporal</strong>.
+                    </p>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script>
@@ -485,7 +548,7 @@
             },
             3: {
                 sistemas: ['Sistema_Prehistorico', 'Sistema_Medieval', 'Sistema_FarWest', 'Sistema_Futurista'],
-                planetas: ['Planeta_HuevoDino', 'Planeta_Hueso', 'Planeta_Fosil', 'Planeta_Castillo', 'Planeta_Yelmo', 'Planeta_Escudo', 'Planeta_Cadenas', 'Planeta_GorroCowboy', 'Planeta_Dinamita', 'Planeta_Rueda', 'Planeta_Saloon', 'Planeta_PlacaBase', 'Planeta_Neon', 'Planeta_Holograma']
+                planetas: ['Planeta_HuevoDino', 'Planeta_Hueso', 'Planeta_Fosil', 'Planeta_Castillo', 'Planeta_Yelmo', 'Planeta_Escudo', 'Planeta_Cadenas', 'Planeta_GorroCowboy', 'Planeta_Dinamita', 'Planeta_Rueda', 'Planeta_Barril', 'Planeta_PlacaBase', 'Planeta_Neon', 'Planeta_Holograma']
             },
             4: {
                 sistemas: ['Sistema_Pizza', 'Sistema_Deporte', 'Sistema_Chuche', 'Sistema_Windows'],
@@ -518,7 +581,7 @@
             'Sistema_Fuego': ['Planeta_Chispa', 'Planeta_Magma', 'Planeta_Llamas'],
             'Sistema_Prehistorico': ['Planeta_HuevoDino', 'Planeta_Hueso', 'Planeta_Fosil'],
             'Sistema_Medieval': ['Planeta_Castillo', 'Planeta_Yelmo', 'Planeta_Escudo', 'Planeta_Cadenas'],
-            'Sistema_FarWest': ['Planeta_GorroCowboy', 'Planeta_Dinamita', 'Planeta_Rueda', 'Planeta_Saloon'],
+            'Sistema_FarWest': ['Planeta_GorroCowboy', 'Planeta_Dinamita', 'Planeta_Rueda', 'Planeta_Barril'],
             'Sistema_Futurista': ['Planeta_PlacaBase', 'Planeta_Neon', 'Planeta_Holograma'],
             'Sistema_Pizza': ['Planeta_Queso', 'Planeta_Tomate', 'Planeta_Cebolla', 'Planeta_Pepperoni', 'Planeta_Champiñon'],
             'Sistema_Deporte': ['Planeta_Futbol', 'Planeta_Basket', 'Planeta_Voley', 'Planeta_Tenis', 'Planeta_Beisbol'],
@@ -567,6 +630,12 @@
                 { id: 'Habilidad_Estelar_Duplicacion', rareza: 'epico', niveles: [4, 5], desc: 'PASIVA: Estelares x2.' },
                 { id: 'Habilidad_Grav_MasaDoble', rareza: 'epico', niveles: [4, 5], desc: 'PASIVA: Gravitatorias x2.' },
                 { id: 'Habilidad_ProtecciónPlanetaria', rareza: 'epico', niveles: [4, 5], desc: 'PASIVA: -1 Daño.' },
+                { id: 'Habilidad_LlaveTemporal', rareza: 'epico', niveles: [3, 4], desc: 'PASIVA: Permite pasar por sistemas planetarios explotados.' },
+                { id: 'Habilidad_LlaveTemporal', rareza: 'raro', niveles: [4, 5], desc: 'PASIVA: Permite pasar por sistemas planetarios explotados.' },
+                { id: 'Habilidad_EstabilizadorEstelar', rareza: 'epico', niveles: [2, 3], desc: 'ACTIVA: Evita la explosión inminente de un sistema planetario (un solo uso, donde sea del universo).' },
+                { id: 'Habilidad_EstabilizadorEstelar', rareza: 'raro', niveles: [4, 5], desc: 'ACTIVA: Evita la explosión inminente de un sistema planetario (un solo uso, donde sea del universo).' },
+                { id: 'Habilidad_CrearPortal', rareza: 'epico', niveles: [4, 5], desc: 'ACTIVA: Crea un portal de 2 o 3 planetas donde tú quieras del universo.' },
+                { id: 'Habilidad_DisfrazRebelde', rareza: 'raro', niveles: [3, 4, 5], desc: 'PASIVA: No te afectan los planetas rebeldes.' },
             ],
             Especial: [
                 { id: 'Carta_UltimaVoluntad_CorreoPrime', rareza: 'raro', niveles: [3], desc: 'Envía inventario al morir.' },
@@ -1025,7 +1094,7 @@
                 if (ev === 'Evento_Explosion_Sistema') {
                     const target = getRandomElement(sistemasActivos); // is system name
                     targetSysName = target;
-                    desc = `Sistema <strong class="text-white">${target.replace('Sistema_','')}</strong> explotará (Daño 4).`;
+                    desc = `Sistema <strong class="text-white">${target.replace('Sistema_','')}</strong> explotará.`;
                     icon = "flame";
                 } else if (ev === 'Evento_Sistema_Infectado') {
                     const target = getRandomElement(sistemasActivos); // is system name
