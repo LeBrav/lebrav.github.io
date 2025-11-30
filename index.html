@@ -658,11 +658,31 @@
             }
             return arr;
         }
-        function generateRareza(forcedRarity = null) {
+        function generateRareza(forcedRarity = null, nivel = null) {
             if (forcedRarity) return forcedRarity;
+            
+            // Probabilidades según nivel
+            let probComun, probRaro, probEpico;
+            if (nivel === 5) {
+                // Nivel 5: 100% épico
+                probComun = 0;
+                probRaro = 0;
+                probEpico = 1.0;
+            } else if (nivel === 4) {
+                // Nivel 4: 50% común, 30% raro, 20% épico
+                probComun = 0.50;
+                probRaro = 0.30;
+                probEpico = 0.20;
+            } else {
+                // Niveles 1-3: 60% común, 30% raro, 10% épico
+                probComun = RAREZA_PROBABILIDAD.comun;
+                probRaro = RAREZA_PROBABILIDAD.raro;
+                probEpico = RAREZA_PROBABILIDAD.epico;
+            }
+            
             const rand = Math.random();
-            if (rand < RAREZA_PROBABILIDAD.comun) return 'comun';
-            if (rand < RAREZA_PROBABILIDAD.comun + RAREZA_PROBABILIDAD.raro) return 'raro';
+            if (rand < probComun) return 'comun';
+            if (rand < probComun + probRaro) return 'raro';
             return 'epico';
         }
 
@@ -917,7 +937,7 @@
         function generateItem(tipo, nivel, forcedRarity = null) {
             const itemsValidos = ITEMS_POR_TIPO[tipo].filter(item => item.niveles.includes(nivel));
             if (itemsValidos.length === 0) return null;
-            const rareza = generateRareza(forcedRarity);
+            const rareza = generateRareza(forcedRarity, nivel);
             let candidatos = itemsValidos.filter(i => i.rareza === rareza);
             if (candidatos.length === 0) candidatos = itemsValidos; 
             const itemElegido = getRandomElement(candidatos);
