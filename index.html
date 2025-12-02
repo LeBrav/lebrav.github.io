@@ -343,13 +343,16 @@
 
         /* BOSS BADGES */
         .badge-boss {
-            width: 22px;
-            height: 22px;
-            font-size: 14px;
+            width: 16px;
+            height: 16px;
+            font-size: 10px;
             z-index: 40;
-            border: 2px solid white;
+            border: 1px solid white;
             animation: pulseBoss 1.5s infinite;
-            box-shadow: 0 0 10px rgba(255,255,255,0.5);
+            box-shadow: 0 0 5px rgba(255,255,255,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .badge-boss-stellar { background: #fbbf24; color: black; top: -12px; left: 50%; transform: translateX(-50%); }
         .badge-boss-dark { background: #581c87; color: white; bottom: -12px; left: 50%; transform: translateX(-50%); }
@@ -1233,8 +1236,8 @@
                     turnosParaBigCrunch--;
                     if (turnosParaBigCrunch === 0) {
                         // APARECEN BOSSES (Turno 0, antes de destruir)
-                        spawnBosses();
-                        mapOutput.innerHTML = `<p class="font-bold text-purple-400 mb-1">¡BOSSES!</p>Han aparecido en el Nivel 3.`;
+                        const bossLocations = spawnBosses();
+                        mapOutput.innerHTML = `<p class="font-bold text-purple-400 mb-1">¡BOSSES!</p>En: ${bossLocations}`;
                     } else {
                         mapOutput.innerHTML = `<p class="font-bold text-orange-500 mb-1">CUENTA ATRÁS</p>Queda ${turnosParaBigCrunch} turno.`;
                     }
@@ -1283,10 +1286,11 @@
                 }
             });
 
-            if (planetasN3.length < 2) return; // Raro caso
+            if (planetasN3.length < 2) return "Error: No hay espacio."; 
 
             const chosen = shuffleArray(planetasN3).slice(0, 2);
             const bossTypes = ['ESTELAR', 'OSCURO']; // 0: Estelar, 1: Oscuro
+            let locationMsg = [];
 
             chosen.forEach((planet, i) => {
                 const type = bossTypes[i];
@@ -1302,9 +1306,14 @@
                     }
                     // Asignar Boss
                     mapGrid[cellIndex].planetStates[planet].boss = type;
+                    
+                    // Formato bonito para el mensaje
+                    const typeColor = type === 'ESTELAR' ? 'text-yellow-300' : 'text-purple-300';
+                    locationMsg.push(`<br>• <span class="${typeColor}">${type}</span> en <strong class="text-white">${planet}</strong>`);
                 }
             });
             renderMap();
+            return locationMsg.join('');
         }
 
         function generateShopLocations() {
@@ -1469,6 +1478,7 @@
                             st.eventNegative = 0;
                             st.rebel = 0;
                             st.garbage = 0;
+                            st.boss = null; // Borrar bosses al generar eventos
                         });
                     }
                 }
