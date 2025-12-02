@@ -341,6 +341,25 @@
         .badge-portal { background-color: #0ea5e9; top: auto; bottom: -8px; }
         .badge-danger { background-color: #ef4444; bottom: -8px; right: auto; left: -8px; }
 
+        /* BOSS BADGES */
+        .badge-boss {
+            width: 22px;
+            height: 22px;
+            font-size: 14px;
+            z-index: 40;
+            border: 2px solid white;
+            animation: pulseBoss 1.5s infinite;
+            box-shadow: 0 0 10px rgba(255,255,255,0.5);
+        }
+        .badge-boss-stellar { background: #fbbf24; color: black; top: -12px; left: 50%; transform: translateX(-50%); }
+        .badge-boss-dark { background: #581c87; color: white; bottom: -12px; left: 50%; transform: translateX(-50%); }
+        
+        @keyframes pulseBoss { 
+            0% { transform: translateX(-50%) scale(1); box-shadow: 0 0 5px rgba(255,255,255,0.5); } 
+            50% { transform: translateX(-50%) scale(1.2); box-shadow: 0 0 15px rgba(255,255,255,0.8); } 
+            100% { transform: translateX(-50%) scale(1); box-shadow: 0 0 5px rgba(255,255,255,0.5); } 
+        }
+
         .system-label-overlay {
             position: absolute;
             bottom: 2px;
@@ -566,11 +585,27 @@
                 <div class="bg-[#0d1117] p-4 rounded-lg border-l-4 border-purple-500">
                     <h3 class="font-bold text-purple-400 mb-2 flex items-center gap-2">
                         <i data-lucide="users" class="w-4 h-4"></i>
-                        Interacción y Compartir
+                        Interacción y Movimiento
                     </h3>
                     <ul class="list-disc list-inside space-y-1 ml-2 text-gray-300">
-                        <li><strong class="text-white">Movimiento e Interacción:</strong> Si te mueves (ej. 4 planetas), puedes interactuar con TODO lo que encuentres por el camino (tiendas, objetos, etc.) en el mismo turno.</li>
+                        <li><strong class="text-white">Movimiento Libre:</strong> Puedes realizar tantos movimientos como tu personaje permita (4 Explorador, 3 Comerciante). Durante este movimiento, puedes interactuar con <strong class="text-white">TODO</strong> lo que encuentres (Tiendas, Objetos).</li>
+                        <li><strong class="text-white">Regla de Tiendas:</strong> Una vez abres una tienda específica, <strong class="text-red-400">TÚ no puedes volver a usar esa misma tienda este turno</strong> (pero otro jugador sí). Puedes encadenar varias tiendas diferentes en un mismo turno.</li>
                         <li><strong class="text-white">Compartir (Default):</strong> Si otro jugador está en el mismo <strong class="text-white">Planeta</strong>, puedes transferirle Combustible o Cartas (según acuerdo).</li>
+                    </ul>
+                </div>
+
+                <!-- Jefes Finales (Bosses) -->
+                <div class="bg-[#0d1117] p-4 rounded-lg border-l-4 border-yellow-500 mt-4">
+                    <h3 class="font-bold text-yellow-400 mb-2 flex items-center gap-2">
+                        <i data-lucide="crown" class="w-4 h-4"></i>
+                        Jefes Finales (Bosses)
+                    </h3>
+                    <p class="text-gray-300 ml-2 text-xs mb-2">Al inicio del Big Crunch (antes de caer el Nivel 5), aparecen 2 Bosses en el Nivel 3:</p>
+                    <ul class="list-disc list-inside space-y-1 ml-2 text-gray-300 text-xs">
+                        <li><strong class="text-yellow-300">Boss Estelar (E)</strong> y <strong class="text-purple-300">Boss Oscuro (O)</strong>.</li>
+                        <li><strong class="text-white">Cómo Vencerlos:</strong> Reúne <strong class="text-white">5 puntos de Potencia</strong> del tipo correspondiente (Estelar u Oscura) en la casilla del Boss.</li>
+                        <li><strong class="text-white">Cooperativo:</strong> Los puntos pueden sumarse entre jugadores que estén en la misma casilla.</li>
+                        <li><strong class="text-green-400">Recompensa:</strong> 3 Fichas de Potencia del tipo vencido.</li>
                     </ul>
                 </div>
             </div>
@@ -1087,9 +1122,12 @@
                     // Planets Nodes
                     let nodesHTML = '';
                     nodes.forEach(p => {
-                        const pState = data.planetStates && data.planetStates[p.id] ? data.planetStates[p.id] : { shops:0, eventObjects:0, eventPortals:0, eventNegative:0, rebel:0, garbage:0 };
+                        const pState = data.planetStates && data.planetStates[p.id] ? data.planetStates[p.id] : { shops:0, eventObjects:0, eventPortals:0, eventNegative:0, rebel:0, garbage:0, boss:null };
                         
                         let badges = '';
+                        if(pState.boss === 'ESTELAR') badges += `<div class="planet-badge badge-boss badge-boss-stellar">E</div>`;
+                        if(pState.boss === 'OSCURO') badges += `<div class="planet-badge badge-boss badge-boss-dark">O</div>`;
+                        
                         if(pState.shops > 0) badges += `<div class="planet-badge badge-shop">${pState.shops}</div>`;
                         if(pState.eventObjects > 0) badges += `<div class="planet-badge badge-event">!</div>`;
                         if(pState.eventPortals > 0) badges += `<div class="planet-badge badge-portal">P</div>`;
@@ -1192,8 +1230,14 @@
 
             if (faseJuego === 'CUENTA_ATRAS') {
                 if (turnosParaBigCrunch > 0) {
-                    mapOutput.innerHTML = `<p class="font-bold text-orange-500 mb-1">CUENTA ATRÁS</p>Queda ${turnosParaBigCrunch} turno.`;
                     turnosParaBigCrunch--;
+                    if (turnosParaBigCrunch === 0) {
+                        // APARECEN BOSSES (Turno 0, antes de destruir)
+                        spawnBosses();
+                        mapOutput.innerHTML = `<p class="font-bold text-purple-400 mb-1">¡BOSSES!</p>Han aparecido en el Nivel 3.`;
+                    } else {
+                        mapOutput.innerHTML = `<p class="font-bold text-orange-500 mb-1">CUENTA ATRÁS</p>Queda ${turnosParaBigCrunch} turno.`;
+                    }
                     updateUIState();
                     return;
                 } else {
@@ -1227,6 +1271,40 @@
                     mapOutput.innerHTML = "Fin del Universo.";
                 }
             }
+        }
+
+        function spawnBosses() {
+            // Buscar planetas de Nivel 3
+            let planetasN3 = [];
+            mapGrid.forEach((cell, idx) => {
+                if (cell && cell.level === 3) {
+                    const planets = SYSTEM_PLANET_RELATION[cell.systemName];
+                    if (planets) planetasN3 = planetasN3.concat(planets);
+                }
+            });
+
+            if (planetasN3.length < 2) return; // Raro caso
+
+            const chosen = shuffleArray(planetasN3).slice(0, 2);
+            const bossTypes = ['ESTELAR', 'OSCURO']; // 0: Estelar, 1: Oscuro
+
+            chosen.forEach((planet, i) => {
+                const type = bossTypes[i];
+                const sysName = PLANET_TO_SYSTEM_MAP[planet];
+                const cellIndex = mapGrid.findIndex(c => c && c.systemName === sysName);
+                
+                if (cellIndex !== -1) {
+                    if (!mapGrid[cellIndex].planetStates) mapGrid[cellIndex].planetStates = {};
+                    if (!mapGrid[cellIndex].planetStates[planet]) {
+                        mapGrid[cellIndex].planetStates[planet] = {
+                            shops:0, eventObjects:0, eventPortals:0, eventNegative:0, rebel:0, garbage:0, boss: null
+                        };
+                    }
+                    // Asignar Boss
+                    mapGrid[cellIndex].planetStates[planet].boss = type;
+                }
+            });
+            renderMap();
         }
 
         function generateShopLocations() {
