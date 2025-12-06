@@ -133,6 +133,19 @@
             border: 1px solid #bc8cff;
             box-shadow: 0 0 5px rgba(188, 140, 255, 0.2);
         }
+        .rarity-legendaria {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); /* Amarillo oro */
+            color: #78350f; /* Marrón oscuro para contraste */
+            border: 2px solid #fcd34d;
+            box-shadow: 0 0 10px rgba(251, 191, 36, 0.6), 0 0 20px rgba(251, 191, 36, 0.3);
+            font-weight: 900;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            animation: legendariaGlow 2s ease-in-out infinite;
+        }
+        @keyframes legendariaGlow {
+            0%, 100% { box-shadow: 0 0 10px rgba(251, 191, 36, 0.6), 0 0 20px rgba(251, 191, 36, 0.3); }
+            50% { box-shadow: 0 0 15px rgba(251, 191, 36, 0.8), 0 0 30px rgba(251, 191, 36, 0.5); }
+        }
 
         /* ANIMACIÓN BIG CRUNCH */
         @keyframes crunchPulse {
@@ -974,6 +987,8 @@
             nivelActual = 1;
             faseJuego = 'EXPANSION';
             turnosParaBigCrunch = 2;
+            // Resetear contador de legendarias
+            Object.keys(LEGENDARIAS_APARICIONES).forEach(key => delete LEGENDARIAS_APARICIONES[key]);
             initMap(); // Reset map
             updateUIState();
             
@@ -998,6 +1013,8 @@
             
             // 3. Limpiar Estado Interno
             activeRoles = [];
+            // Resetear contador de legendarias
+            Object.keys(LEGENDARIAS_APARICIONES).forEach(key => delete LEGENDARIAS_APARICIONES[key]);
             
             // 4. Resetear UI de Selección de Roles
             document.querySelectorAll('.role-btn').forEach(btn => {
@@ -1128,13 +1145,17 @@
                 { id: 'Habilidad_LlaveTemporal', rareza: 'raro', niveles: [4, 5], desc: 'PASIVA: Permite pasar por sistemas planetarios explotados.' },
                 { id: 'Habilidad_EstabilizadorEstelar', rareza: 'epico', niveles: [2, 3], desc: 'ACTIVA: Evita la explosión inminente de un sistema planetario (un solo uso, donde sea del universo).' },
                 { id: 'Habilidad_EstabilizadorEstelar', rareza: 'raro', niveles: [4, 5], desc: 'ACTIVA: Evita la explosión inminente de un sistema planetario (un solo uso, donde sea del universo).' },
-                { id: 'Habilidad_CrearPortal', rareza: 'epico', niveles: [4, 5], desc: 'ACTIVA: Crea un portal de 2 puertas (2 planetas) donde tú quieras del universo.' },
+                { id: 'Habilidad_CrearPortal', rareza: 'epico', niveles: [4, 5], desc: 'ACTIVA: Crea un portal de 2 puertas (2 planetas) donde tú quieras del universo.', legendaria: true, maxApariciones: 1 },
                 { id: 'Habilidad_DisfrazRebelde', rareza: 'raro', niveles: [3, 4, 5], desc: 'PASIVA: No te afectan los planetas rebeldes.' },
                 { id: 'Habilidad_CompartirEsVivir', rareza: 'raro', niveles: [3, 4, 5], desc: 'ACTIVA: Puedes transferir 2 Vida y/o 3 Combustible tuyos a un aliado.' },
             ],
         };
 
         const RAREZA_PROBABILIDAD = { 'comun': 0.60, 'raro': 0.30, 'epico': 0.10 };
+
+        // --- CONTADOR DE LEGENDARIAS ---
+        // Rastrea cuántas veces ha aparecido cada carta legendaria
+        const LEGENDARIAS_APARICIONES = {};
 
         // --- UTILS ---
         function getRandomElement(arr) {
@@ -1812,15 +1833,40 @@
             if (itemsValidos.length === 0) return null;
             const rareza = generateRareza(forcedRarity, nivel);
             let candidatos = itemsValidos.filter(i => i.rareza === rareza);
-            if (candidatos.length === 0) candidatos = itemsValidos; 
+            
+            // Filtrar legendarias que ya alcanzaron su límite
+            candidatos = candidatos.filter(item => {
+                if (item.legendaria && item.maxApariciones) {
+                    const apariciones = LEGENDARIAS_APARICIONES[item.id] || 0;
+                    return apariciones < item.maxApariciones;
+                }
+                return true;
+            });
+            
+            if (candidatos.length === 0) {
+                // Si no hay candidatos válidos (todas las legendarias alcanzaron límite), usar todos los items válidos sin filtrar legendarias
+                candidatos = itemsValidos.filter(i => i.rareza === rareza);
+                if (candidatos.length === 0) candidatos = itemsValidos;
+            }
+            
             const itemElegido = getRandomElement(candidatos);
             if (!itemElegido) return null;
+            
+            // Incrementar contador si es legendaria
+            if (itemElegido.legendaria && itemElegido.maxApariciones) {
+                if (!LEGENDARIAS_APARICIONES[itemElegido.id]) {
+                    LEGENDARIAS_APARICIONES[itemElegido.id] = 0;
+                }
+                LEGENDARIAS_APARICIONES[itemElegido.id]++;
+            }
+            
             return { ...itemElegido, tipoObjeto: tipo }; 
         }
 
         function createItemCardHTML(item, compact = false) {
             if (!item) return '';
-            const rarityClass = `rarity-${item.rareza}`;
+            const isLegendaria = item.legendaria && item.maxApariciones;
+            const rarityClass = isLegendaria ? 'rarity-legendaria' : `rarity-${item.rareza}`;
             let icon = 'box';
             let colorText = 'text-gray-300';
             if(item.tipoObjeto === 'Vida') { icon = 'heart'; colorText = 'text-red-400'; }
@@ -1832,11 +1878,25 @@
             let details = "";
             if (item.potenciaValor) details += `<span class="text-xs bg-gray-700 px-2 py-1 rounded text-white">Potencia: ${item.potenciaValor}</span>`;
             if (item.desc) details += `<p class="text-xs text-gray-400 mt-2 italic border-t border-gray-700 pt-1">"${item.desc}"</p>`;
+            
+            // Mensaje de legendaria
+            if (isLegendaria) {
+                const apariciones = LEGENDARIAS_APARICIONES[item.id] || 0;
+                const restantes = item.maxApariciones - apariciones;
+                details += `<p class="text-xs text-yellow-400 font-bold mt-2 border-t border-yellow-600/30 pt-1 bg-yellow-900/10 px-2 py-1 rounded">
+                    ⭐ LEGENDARIA: Aparece ${item.maxApariciones} vez${item.maxApariciones > 1 ? 'es' : ''} en total (${restantes} restante${restantes !== 1 ? 's' : ''})
+                </p>`;
+            }
 
             if (compact) {
                 let compactDetails = "";
                 if (item.potenciaValor) compactDetails += `<div class="mt-1"><span class="text-[10px] bg-gray-800 px-1.5 py-0.5 rounded text-yellow-200 border border-gray-700 inline-block font-mono">⚡ Potencia: ${item.potenciaValor}</span></div>`;
                 if (item.desc) compactDetails += `<p class="text-[10px] text-gray-400 italic mt-1">"${item.desc}"</p>`;
+                if (isLegendaria) {
+                    const apariciones = LEGENDARIAS_APARICIONES[item.id] || 0;
+                    const restantes = item.maxApariciones - apariciones;
+                    compactDetails += `<p class="text-[10px] text-yellow-400 font-bold mt-1 border-t border-yellow-600/30 pt-1">⭐ LEGENDARIA: ${item.maxApariciones} vez${item.maxApariciones > 1 ? 'es' : ''} total (${restantes} restante${restantes !== 1 ? 's' : ''})</p>`;
+                }
 
                 return `
                     <div class="event-item-preview p-3 bg-[#0b0e14] border border-gray-700 rounded-xl flex flex-col gap-1">
@@ -1845,7 +1905,7 @@
                                 <i data-lucide="${icon}" class="w-4 h-4 ${colorText}"></i>
                                 <span class="text-xs font-bold text-white">${item.id.replace(/_/g, ' ')}</span>
                             </div>
-                            <span class="rarity-tag ${rarityClass} scale-90 origin-right">${item.rareza}</span>
+                            <span class="rarity-tag ${rarityClass} scale-90 origin-right">${isLegendaria ? 'LEGENDARIA' : item.rareza}</span>
                         </div>
                         ${compactDetails}
                     </div>
@@ -1859,7 +1919,7 @@
                             <i data-lucide="${icon}" class="w-4 h-4 ${colorText}"></i>
                             <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">${item.tipoObjeto}</span>
                         </div>
-                        <span class="rarity-tag ${rarityClass}">${item.rareza}</span>
+                        <span class="rarity-tag ${rarityClass}">${isLegendaria ? 'LEGENDARIA' : item.rareza}</span>
                     </div>
                     <div class="font-bold text-xs sm:text-sm text-white leading-tight">
                         ${item.id.replace(/_/g, ' ')}
