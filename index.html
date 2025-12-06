@@ -694,7 +694,7 @@
                             <strong class="text-cyan-300">Llave de la Singularidad:</strong> Necesaria para abrir el núcleo.
                             <ul class="list-circle list-inside ml-4 mt-1 text-xs text-gray-400">
                                 <li>1-2 Jugadores: <strong class="text-white">1 Llave Completa</strong>.</li>
-                                <li>3-4 Jugadores: <strong class="text-white">2 Llaves Completas</strong> (La "O" y la Punta).</li>
+                                <li>3-4 Jugadores: <strong class="text-white">2 Llaves Completas</strong> .</li>
                             </ul>
                         </li>
                         <li class="border-t border-gray-700 pt-2 mt-2">
@@ -727,7 +727,7 @@
                         Portales
                     </h3>
                     <p class="text-gray-300 ml-2">
-                        <strong class="text-white">Pasar por un portal NO cuenta como movimiento del personaje</strong>, pero <strong class="text-orange-400">gastas 1 de combustible</strong> al usarlo.
+                        <strong class="text-white">Pasar por un portal NO cuenta como movimiento del personaje</strong>, pero <strong class="text-orange-400">gastas 1 de combustible</strong> al usarlo. <strong class="text-green-300">Puedes usar el mismo portal tantas veces como quieras en el mismo turno</strong>, gastando <strong class="text-orange-400">1 de combustible por cada uso</strong>.
                     </p>
                 </div>
 
@@ -758,6 +758,20 @@
                     </ul>
                 </div>
 
+                <!-- Recuperación de Movimientos -->
+                <div class="bg-[#0d1117] p-4 rounded-lg border-l-4 border-emerald-500">
+                    <h3 class="font-bold text-emerald-400 mb-2 flex items-center gap-2">
+                        <i data-lucide="heart-pulse" class="w-4 h-4"></i>
+                        Recuperación de Movimientos
+                    </h3>
+                    <p class="text-gray-300 ml-2 text-sm">
+                        Si durante un turno tienes <strong class="text-yellow-400">velocidad reducida (1/2)</strong> porque tu vida está a la mitad o menos, pero <strong class="text-green-400">te curas por encima de la mitad de vida</strong> durante ese mismo turno, <strong class="text-white">recuperas tus movimientos completos</strong>.
+                    </p>
+                    <p class="text-gray-400 ml-2 text-xs mt-2 italic">
+                        Ejemplo: Si tienes 2 movimientos por velocidad reducida, pero al primer movimiento te curas por encima de la mitad, recuperas los <strong class="text-white">3 movimientos</strong> normales (o <strong class="text-white">4</strong> si eres Explorador).
+                    </p>
+                </div>
+
                 <!-- Jefes Finales (Bosses) -->
                 <div class="bg-[#0d1117] p-4 rounded-lg border-l-4 border-yellow-500 mt-4">
                     <h3 class="font-bold text-yellow-400 mb-2 flex items-center gap-2">
@@ -770,6 +784,7 @@
                         <li><strong class="text-white">Cómo Vencerlos:</strong> Reúne <strong class="text-white">5 puntos de Potencia</strong> del tipo correspondiente (Estelar u Oscura) en la casilla del Boss.</li>
                         <li><strong class="text-white">Cooperativo:</strong> Los puntos pueden sumarse entre jugadores que estén en la misma casilla.</li>
                         <li><strong class="text-green-400">Recompensa:</strong> 3 Fichas de Potencia del tipo vencido.</li>
+                        <li><strong class="text-red-400">⚠️ ADVERTENCIA:</strong> Si vas al planeta del Boss y <strong class="text-white">NO LO COMBATES</strong>, recibes <strong class="text-red-400">-2 de vida</strong>.</li>
                     </ul>
                 </div>
             </div>
@@ -1100,7 +1115,7 @@
                 { id: 'Habilidad_ExpansiónTemporal', rareza: 'raro', niveles: [3, 4], desc: 'ACTIVA: Repite movimiento.' },
                 { id: 'Habilidad_Estelar_Duplicacion', rareza: 'epico', niveles: [4, 5], desc: 'PASIVA: Estelares x2.' },
                 { id: 'Habilidad_Grav_MasaDoble', rareza: 'epico', niveles: [4, 5], desc: 'PASIVA: Gravitatorias x2.' },
-                { id: 'Habilidad_ProtecciónPlanetaria', rareza: 'epico', niveles: [4, 5], desc: 'PASIVA: -1 Daño.' },
+                { id: 'Habilidad_ProtecciónPlanetaria', rareza: 'epico', niveles: [4, 5], desc: 'PASIVA: Protege hasta 1 de daño por turno.' },
                 { id: 'Habilidad_LlaveTemporal', rareza: 'epico', niveles: [3, 4], desc: 'PASIVA: Permite pasar por sistemas planetarios explotados.' },
                 { id: 'Habilidad_LlaveTemporal', rareza: 'raro', niveles: [4, 5], desc: 'PASIVA: Permite pasar por sistemas planetarios explotados.' },
                 { id: 'Habilidad_EstabilizadorEstelar', rareza: 'epico', niveles: [2, 3], desc: 'ACTIVA: Evita la explosión inminente de un sistema planetario (un solo uso, donde sea del universo).' },
@@ -1615,7 +1630,7 @@
                     if (turnosParaBigCrunch === 0) {
                         // APARECEN BOSSES (Turno 0, antes de destruir)
                         const bossLocations = spawnBosses();
-                        mapOutput.innerHTML = `<p class="font-bold text-purple-400 mb-1">¡BOSSES!</p>En: ${bossLocations}`;
+                        mapOutput.innerHTML = `<p class="font-bold text-purple-400 mb-1">¡BOSSES!</p>En: ${bossLocations}<br><span class="text-red-400 text-[10px] mt-2 block border-t border-gray-700 pt-2"><strong>⚠️ ADVERTENCIA:</strong> Si vas al planeta del Boss y <strong>NO LO COMBATES</strong>, recibes <strong>-2 de vida</strong>.</span>`;
                     } else {
                         mapOutput.innerHTML = `<p class="font-bold text-orange-500 mb-1">CUENTA ATRÁS</p>Queda ${turnosParaBigCrunch} turno.`;
                     }
