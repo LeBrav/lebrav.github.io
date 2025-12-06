@@ -783,6 +783,7 @@
                         <li><strong class="text-yellow-300">Boss Estelar (E)</strong> y <strong class="text-purple-300">Boss Oscuro (O)</strong>.</li>
                         <li><strong class="text-white">Cómo Vencerlos:</strong> Reúne <strong class="text-white">5 puntos de Potencia</strong> del tipo correspondiente (Estelar u Oscura) en la casilla del Boss.</li>
                         <li><strong class="text-white">Cooperativo:</strong> Los puntos pueden sumarse entre jugadores que estén en la misma casilla.</li>
+                        <li><strong class="text-cyan-400">⚠️ IMPORTANTE:</strong> La habilidad <strong class="text-white">Duplicación Estelar</strong> <strong class="text-red-400">NO FUNCIONA</strong> contra los Bosses. Solo cuentan los puntos de Potencia que <strong class="text-white">realmente tienes</strong>, sin duplicaciones.</li>
                         <li><strong class="text-green-400">Recompensa:</strong> 3 Fichas de Potencia del tipo vencido.</li>
                         <li><strong class="text-red-400">⚠️ ADVERTENCIA:</strong> Si vas al planeta del Boss y <strong class="text-white">NO LO COMBATES</strong>, recibes <strong class="text-red-400">-2 de vida</strong>.</li>
                     </ul>
@@ -897,8 +898,15 @@
                     <div><span class="inline-block w-2 h-2 rounded-full bg-[#0c2d6b] mr-1"></span>Raro 30%</div>
                     <div class="text-purple-300"><span class="inline-block w-2 h-2 rounded-full bg-[#2e1a4d] mr-1"></span>Épico 20%</div>
                 `;
+            } else if (level === 2) {
+                // 65% Com, 30% Rar, 5% Epi
+                html = `
+                    <div><span class="inline-block w-2 h-2 rounded-full bg-[#30363d] mr-1"></span>Común 65%</div>
+                    <div><span class="inline-block w-2 h-2 rounded-full bg-[#0c2d6b] mr-1"></span>Raro 30%</div>
+                    <div><span class="inline-block w-2 h-2 rounded-full bg-[#2e1a4d] mr-1"></span>Épico 5%</div>
+                `;
             } else {
-                // 60% Com, 30% Rar, 10% Epi
+                // Niveles 1 y 3: 60% Com, 30% Rar, 10% Epi
                 html = `
                     <div><span class="inline-block w-2 h-2 rounded-full bg-[#30363d] mr-1"></span>Común 60%</div>
                     <div><span class="inline-block w-2 h-2 rounded-full bg-[#0c2d6b] mr-1"></span>Raro 30%</div>
@@ -1156,8 +1164,13 @@
                 probComun = 0.50;
                 probRaro = 0.30;
                 probEpico = 0.20;
+            } else if (nivel === 2) {
+                // Nivel 2: 65% común, 30% raro, 5% épico
+                probComun = 0.65;
+                probRaro = 0.30;
+                probEpico = 0.05;
             } else {
-                // Niveles 1-3: 60% común, 30% raro, 10% épico
+                // Niveles 1 y 3: 60% común, 30% raro, 10% épico
                 probComun = RAREZA_PROBABILIDAD.comun;
                 probRaro = RAREZA_PROBABILIDAD.raro;
                 probEpico = RAREZA_PROBABILIDAD.epico;
