@@ -196,10 +196,9 @@
             max-width: 300px;
         }
         
-        /* MAPA VISUAL GRID MEJORADO */
+        /* MAPA VISUAL GRID MEJORADO - DINÁMICO */
         .map-grid {
             display: grid;
-            grid-template-columns: repeat(7, 1fr);
             gap: 4px; /* Pequeño espacio visual entre cartas */
             aspect-ratio: 1 / 1;
             width: 100%;
@@ -208,7 +207,10 @@
             background-color: #05070a;
             padding: 4px;
             border-radius: 8px;
+            transition: all 0.3s ease;
         }
+        
+        /* Dinámicamente se ajustará grid-template-columns vía JS */
         
         .map-cell {
             background-color: rgba(22, 27, 34, 0.8);
@@ -1511,87 +1513,132 @@
             const gridEl = document.getElementById('visual-map');
             gridEl.innerHTML = '';
 
+            // Calcular el tamaño del grid dinámicamente basándose en celdas ocupadas
+            let occupiedCells = [];
             for(let i=0; i<49; i++) {
-                const cell = document.createElement('div');
-                cell.className = 'map-cell';
-                
-                const data = mapGrid[i];
-                if (data) {
-                    cell.classList.add(`cell-lvl-${data.level}`);
-                    
-                    const layout = getSystemLayout(data.systemName);
-                    const nodes = layout.nodes;
-                    const connections = layout.connections;
-                    const exits = layout.exits;
-                    
-                    // SVG Connections
-                    let svgHTML = `<svg class="connections-svg" viewBox="0 0 100 100">`;
-                    
-                    // 1. External Connections (Salidas)
-                    // Siempre conectamos al centro de los bordes (50,0), (100,50), (50,100), (0,50)
-                    if (exits) {
-                        const nNode = nodes.find(n => n.id === exits.N);
-                        if(nNode) svgHTML += `<line x1="${nNode.x}" y1="${nNode.y}" x2="50" y2="0" class="connection-line" />`;
-                        
-                        const eNode = nodes.find(n => n.id === exits.E);
-                        if(eNode) svgHTML += `<line x1="${eNode.x}" y1="${eNode.y}" x2="100" y2="50" class="connection-line" />`;
-                        
-                        const sNode = nodes.find(n => n.id === exits.S);
-                        if(sNode) svgHTML += `<line x1="${sNode.x}" y1="${sNode.y}" x2="50" y2="100" class="connection-line" />`;
-                        
-                        const wNode = nodes.find(n => n.id === exits.W);
-                        if(wNode) svgHTML += `<line x1="${wNode.x}" y1="${wNode.y}" x2="0" y2="50" class="connection-line" />`;
-                    }
-                    
-                    // 2. Internal Connections
-                    connections.forEach(pair => {
-                         const p1 = nodes.find(n => n.id === pair[0]);
-                         const p2 = nodes.find(n => n.id === pair[1]);
-                         if (p1 && p2) {
-                             svgHTML += `<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" class="connection-line" />`;
-                         }
-                    });
-                    
-                    svgHTML += `</svg>`;
-                    
-                    // Planets Nodes
-                    let nodesHTML = '';
-                    nodes.forEach(p => {
-                        const pState = data.planetStates && data.planetStates[p.id] ? data.planetStates[p.id] : { shops:0, eventObjects:0, eventPortals:0, eventNegative:0, rebel:0, garbage:0, boss:null, hasKey:false };
-                        
-                        let badges = '';
-                        if(pState.boss === 'ESTELAR') badges += `<div class="planet-badge badge-boss badge-boss-stellar">E</div>`;
-                        if(pState.boss === 'OSCURO') badges += `<div class="planet-badge badge-boss badge-boss-dark">O</div>`;
-                        
-                        if(pState.hasKey) badges += `<div class="planet-badge badge-key" title="Llave Singularidad">🗝️</div>`;
+                if (mapGrid[i]) {
+                    const row = Math.floor(i / 7);
+                    const col = i % 7;
+                    occupiedCells.push({index: i, row, col});
+                }
+            }
 
-                        if(pState.shops > 0) badges += `<div class="planet-badge badge-shop">${pState.shops}</div>`;
-                        if(pState.eventObjects > 0) badges += `<div class="planet-badge badge-event">!</div>`;
-                        if(pState.eventPortals > 0) badges += `<div class="planet-badge badge-portal">P</div>`;
-                        if(pState.rebel > 0) badges += `<div class="planet-badge badge-danger" style="background-color:#ef4444">R</div>`;
-                        if(pState.garbage > 0) badges += `<div class="planet-badge badge-danger" style="background-color:#f97316">B</div>`;
-                        // Evento personal u otros
-                        if(pState.eventNegative > 0 && pState.rebel === 0 && pState.garbage === 0) badges += `<div class="planet-badge badge-danger">X</div>`;
+            // Calcular límites (min/max row y col)
+            let minRow = 3, maxRow = 3, minCol = 3, maxCol = 3; // Empieza en centro (3,3)
+            if (occupiedCells.length > 0) {
+                minRow = Math.min(...occupiedCells.map(c => c.row));
+                maxRow = Math.max(...occupiedCells.map(c => c.row));
+                minCol = Math.min(...occupiedCells.map(c => c.col));
+                maxCol = Math.max(...occupiedCells.map(c => c.col));
+            }
 
-                        nodesHTML += `
-                            <div class="planet-node active-node" style="left: ${p.x}%; top: ${p.y}%;" title="${p.id}">
-                                ${badges}
+            const gridRows = maxRow - minRow + 1;
+            const gridCols = maxCol - minCol + 1;
+            const gridSize = Math.max(gridRows, gridCols); // Cuadrado
+
+            // Ajustar el grid CSS dinámicamente
+            gridEl.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
+
+            // Escalar elementos según el tamaño del grid (más pequeño = más espacio por celda)
+            // 1x1 = 2.5x, 3x3 = 1.8x, 5x5 = 1.3x, 7x7 = 1x
+            const scaleFactor = gridSize === 1 ? 2.5 : gridSize === 3 ? 1.8 : gridSize === 5 ? 1.3 : 1.0;
+            
+            // Aplicar escala dinámica al contenedor
+            gridEl.style.setProperty('--scale-factor', scaleFactor);
+
+            // Renderizar solo las celdas necesarias
+            for(let r = minRow; r <= minRow + gridSize - 1; r++) {
+                for(let c = minCol; c <= minCol + gridSize - 1; c++) {
+                    const i = r * 7 + c;
+                    
+                    const cell = document.createElement('div');
+                    cell.className = 'map-cell';
+                    
+                    const data = mapGrid[i];
+                    if (data) {
+                        cell.classList.add(`cell-lvl-${data.level}`);
+                        
+                        const layout = getSystemLayout(data.systemName);
+                        const nodes = layout.nodes;
+                        const connections = layout.connections;
+                        const exits = layout.exits;
+                        
+                        // SVG Connections
+                        let svgHTML = `<svg class="connections-svg" viewBox="0 0 100 100">`;
+                        
+                        // 1. External Connections (Salidas)
+                        if (exits) {
+                            const nNode = nodes.find(n => n.id === exits.N);
+                            if(nNode) svgHTML += `<line x1="${nNode.x}" y1="${nNode.y}" x2="50" y2="0" class="connection-line" />`;
+                            
+                            const eNode = nodes.find(n => n.id === exits.E);
+                            if(eNode) svgHTML += `<line x1="${eNode.x}" y1="${eNode.y}" x2="100" y2="50" class="connection-line" />`;
+                            
+                            const sNode = nodes.find(n => n.id === exits.S);
+                            if(sNode) svgHTML += `<line x1="${sNode.x}" y1="${sNode.y}" x2="50" y2="100" class="connection-line" />`;
+                            
+                            const wNode = nodes.find(n => n.id === exits.W);
+                            if(wNode) svgHTML += `<line x1="${wNode.x}" y1="${wNode.y}" x2="0" y2="50" class="connection-line" />`;
+                        }
+                        
+                        // 2. Internal Connections (línea más gruesa en grids pequeños)
+                        const lineWidth = scaleFactor * 1.5;
+                        connections.forEach(pair => {
+                             const p1 = nodes.find(n => n.id === pair[0]);
+                             const p2 = nodes.find(n => n.id === pair[1]);
+                             if (p1 && p2) {
+                                 svgHTML += `<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" class="connection-line" style="stroke-width: ${lineWidth}px;" />`;
+                             }
+                        });
+                        
+                        svgHTML += `</svg>`;
+                        
+                        // Planets Nodes (escalados)
+                        let nodesHTML = '';
+                        const nodeSize = 12 * scaleFactor;
+                        nodes.forEach(p => {
+                            const pState = data.planetStates && data.planetStates[p.id] ? data.planetStates[p.id] : { shops:0, eventObjects:0, eventPortals:0, eventNegative:0, rebel:0, garbage:0, boss:null, hasKey:false };
+                            
+                            let badges = '';
+                            const badgeSize = 14 * scaleFactor;
+                            const badgeFontSize = 8 * scaleFactor;
+                            
+                            if(pState.boss === 'ESTELAR') badges += `<div class="planet-badge badge-boss badge-boss-stellar" style="width:${badgeSize+2}px;height:${badgeSize+2}px;font-size:${badgeFontSize+2}px;">E</div>`;
+                            if(pState.boss === 'OSCURO') badges += `<div class="planet-badge badge-boss badge-boss-dark" style="width:${badgeSize+2}px;height:${badgeSize+2}px;font-size:${badgeFontSize+2}px;">O</div>`;
+                            
+                            if(pState.hasKey) badges += `<div class="planet-badge badge-key" style="width:${badgeSize+2}px;height:${badgeSize+2}px;font-size:${badgeFontSize+1}px;" title="Llave Singularidad">🗝️</div>`;
+
+                            if(pState.shops > 0) badges += `<div class="planet-badge badge-shop" style="width:${badgeSize}px;height:${badgeSize}px;font-size:${badgeFontSize}px;">${pState.shops}</div>`;
+                            if(pState.eventObjects > 0) badges += `<div class="planet-badge badge-event" style="width:${badgeSize}px;height:${badgeSize}px;font-size:${badgeFontSize}px;">!</div>`;
+                            if(pState.eventPortals > 0) badges += `<div class="planet-badge badge-portal" style="width:${badgeSize}px;height:${badgeSize}px;font-size:${badgeFontSize}px;">P</div>`;
+                            if(pState.rebel > 0) badges += `<div class="planet-badge badge-danger" style="background-color:#ef4444;width:${badgeSize}px;height:${badgeSize}px;font-size:${badgeFontSize}px;">R</div>`;
+                            if(pState.garbage > 0) badges += `<div class="planet-badge badge-danger" style="background-color:#f97316;width:${badgeSize}px;height:${badgeSize}px;font-size:${badgeFontSize}px;">B</div>`;
+                            if(pState.eventNegative > 0 && pState.rebel === 0 && pState.garbage === 0) badges += `<div class="planet-badge badge-danger" style="width:${badgeSize}px;height:${badgeSize}px;font-size:${badgeFontSize}px;">X</div>`;
+
+                            nodesHTML += `
+                                <div class="planet-node active-node" style="left: ${p.x}%; top: ${p.y}%; width:${nodeSize}px; height:${nodeSize}px;" title="${p.id}">
+                                    ${badges}
+                                </div>
+                            `;
+                        });
+
+                        // Nombre del sistema escalado y más visible
+                        const labelFontSize = 0.4 * scaleFactor;
+                        const labelOpacity = scaleFactor > 1.5 ? 0.9 : 0.7; // Mucho más visible
+                        
+                        cell.innerHTML = `
+                            <div class="system-container">
+                                ${data.systemDanger ? '<div class="system-danger-overlay"></div>' : ''}
+                                ${data.systemInfected ? '<div class="system-infected-overlay"></div>' : ''}
+                                ${svgHTML}
+                                ${nodesHTML}
+                                <div class="system-label-overlay" style="font-size: ${labelFontSize}rem; color: rgba(255,255,255,${labelOpacity}); text-shadow: 0 1px 3px rgba(0,0,0,0.8);">${data.systemName.replace('Sistema_', '').replace(/_/g, ' ')}</div>
                             </div>
                         `;
-                    });
+                    }
 
-                    cell.innerHTML = `
-                        <div class="system-container">
-                            ${data.systemDanger ? '<div class="system-danger-overlay"></div>' : ''}
-                            ${data.systemInfected ? '<div class="system-infected-overlay"></div>' : ''}
-                            ${svgHTML}
-                            ${nodesHTML}
-                            <div class="system-label-overlay">${data.systemName.replace('Sistema_', '').replace(/_/g, ' ')}</div>
-                        </div>
-                    `;
+                    gridEl.appendChild(cell);
                 }
-
-                gridEl.appendChild(cell);
             }
         }
 
