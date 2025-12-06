@@ -1128,7 +1128,7 @@
                 { id: 'Habilidad_LlaveTemporal', rareza: 'raro', niveles: [4, 5], desc: 'PASIVA: Permite pasar por sistemas planetarios explotados.' },
                 { id: 'Habilidad_EstabilizadorEstelar', rareza: 'epico', niveles: [2, 3], desc: 'ACTIVA: Evita la explosión inminente de un sistema planetario (un solo uso, donde sea del universo).' },
                 { id: 'Habilidad_EstabilizadorEstelar', rareza: 'raro', niveles: [4, 5], desc: 'ACTIVA: Evita la explosión inminente de un sistema planetario (un solo uso, donde sea del universo).' },
-                { id: 'Habilidad_CrearPortal', rareza: 'epico', niveles: [4, 5], desc: 'ACTIVA: Crea un portal de 2 o 3 planetas donde tú quieras del universo.' },
+                { id: 'Habilidad_CrearPortal', rareza: 'epico', niveles: [4, 5], desc: 'ACTIVA: Crea un portal de 2 puertas (2 planetas) donde tú quieras del universo.' },
                 { id: 'Habilidad_DisfrazRebelde', rareza: 'raro', niveles: [3, 4, 5], desc: 'PASIVA: No te afectan los planetas rebeldes.' },
                 { id: 'Habilidad_CompartirEsVivir', rareza: 'raro', niveles: [3, 4, 5], desc: 'ACTIVA: Puedes transferir 2 Vida y/o 3 Combustible tuyos a un aliado.' },
             ],
@@ -1749,8 +1749,41 @@
             mapGrid.forEach(c => { if(c && c.level > 1) numSistemas++; }); 
 
             const minShops = Math.max(1, Math.floor(numSistemas / 2));
-            const shuffledPlanets = shuffleArray([...planetasActivos]);
-            const selectedPlanets = shuffledPlanets.slice(0, minShops);
+            
+            // Separar planetas de nivel 5 y otros niveles
+            let planetasNivel5 = [];
+            let planetasOtrosNiveles = [];
+            
+            planetasActivos.forEach(planet => {
+                const system = PLANET_TO_SYSTEM_MAP[planet];
+                const cellIndex = mapGrid.findIndex(c => c && c.systemName === system);
+                if (cellIndex !== -1 && mapGrid[cellIndex].level === 5) {
+                    planetasNivel5.push(planet);
+                } else {
+                    planetasOtrosNiveles.push(planet);
+                }
+            });
+
+            // Para nivel 5: máximo 1 tienda por sistema
+            let sistemasNivel5ConTienda = new Set();
+            let selectedPlanets = [];
+            
+            // Primero asignar tiendas a nivel 5 (máximo 1 por sistema)
+            const shuffledNivel5 = shuffleArray([...planetasNivel5]);
+            for (const planet of shuffledNivel5) {
+                const system = PLANET_TO_SYSTEM_MAP[planet];
+                if (!sistemasNivel5ConTienda.has(system)) {
+                    selectedPlanets.push(planet);
+                    sistemasNivel5ConTienda.add(system);
+                }
+            }
+            
+            // Luego completar con otros niveles hasta alcanzar minShops
+            const shuffledOtros = shuffleArray([...planetasOtrosNiveles]);
+            for (const planet of shuffledOtros) {
+                if (selectedPlanets.length >= minShops) break;
+                selectedPlanets.push(planet);
+            }
 
             // Asignar al mapa
             let locationListHTML = '<ul class="space-y-1">';
