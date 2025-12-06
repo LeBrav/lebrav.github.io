@@ -340,6 +340,40 @@
         .badge-event { background-color: #3fb950; }
         .badge-portal { background-color: #0ea5e9; top: auto; bottom: -8px; }
         .badge-danger { background-color: #ef4444; bottom: -8px; right: auto; left: -8px; }
+        .badge-key { 
+            background-color: #eab308; /* Yellow */
+            color: black; 
+            border: 1px solid #fef08a; 
+            width: 16px; height: 16px; 
+            font-size: 9px;
+            top: auto; bottom: -8px; right: 50%; transform: translateX(50%);
+            box-shadow: 0 0 8px rgba(234, 179, 8, 0.8);
+            animation: pulseKey 1.5s infinite;
+            z-index: 45;
+            display: flex; align-items: center; justify-content: center;
+        }
+        /* KEY RING (ANILLA) */
+        .badge-key-ring {
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            border: 3px solid #eab308; /* Anillo grueso */
+            background: transparent;
+            box-shadow: 0 0 10px rgba(234, 179, 8, 0.9);
+        }
+        /* KEY TIP (PUNTA) */
+        .badge-key-tip {
+            width: 10px; height: 18px;
+            border-radius: 2px;
+            background: #eab308;
+            clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 50% 80%, 0% 100%); /* Forma dentada simple */
+            box-shadow: 0 0 10px rgba(234, 179, 8, 0.9);
+        }
+
+        @keyframes pulseKey {
+            0% { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.4); transform: translateX(50%) scale(1); }
+            70% { box-shadow: 0 0 0 6px rgba(234, 179, 8, 0); transform: translateX(50%) scale(1.2); }
+            100% { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0); transform: translateX(50%) scale(1); }
+        }
 
         /* BOSS BADGES */
         .badge-boss {
@@ -381,7 +415,98 @@
 </head>
 <body class="p-2 sm:p-6 min-h-screen">
 
-    <div class="max-w-6xl mx-auto">
+    <!-- PANTALLA DE INICIO / SELECCIÓN DE PERSONAJES -->
+    <div id="setup-screen" class="max-w-4xl mx-auto mt-10">
+        <div class="text-center mb-10">
+            <h1 class="text-5xl sm:text-7xl font-black text-[#ffcc00] tracking-tight mb-4" style="text-shadow: 0 0 30px rgba(255, 204, 0, 0.3);">
+                BIG CRUNCH
+            </h1>
+            <p class="text-xl text-gray-400 font-tech uppercase tracking-widest">Configuración de Misión</p>
+        </div>
+
+        <div class="card p-8 rounded-3xl border-2 border-gray-700 bg-opacity-95">
+            <h2 class="text-2xl font-bold text-white mb-6 text-center">SELECCIONA TRIPULACIÓN</h2>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <!-- Explorador (Verde) -->
+                <button id="btn-role-explorador" onclick="toggleRole('EXPLORADOR')" class="role-btn group relative p-6 rounded-xl border-2 border-gray-700 hover:border-green-500 bg-[#0d1117] transition-all duration-300 flex flex-col items-center gap-4">
+                    <div class="w-16 h-16 rounded-full bg-green-900/30 flex items-center justify-center border-2 border-green-500/50 group-hover:border-green-400 group-hover:shadow-[0_0_20px_rgba(74,222,128,0.4)] transition-all">
+                        <i data-lucide="compass" class="w-8 h-8 text-green-400"></i>
+                    </div>
+                    <div class="text-center">
+                        <h3 class="font-bold text-green-400 text-lg">EXPLORADOR</h3>
+                        <div class="text-xs text-gray-500 mt-1">4 Movimientos</div>
+                    </div>
+                    <div class="absolute top-4 right-4 w-6 h-6 rounded-full border border-gray-600 bg-gray-800 flex items-center justify-center check-indicator">
+                        <i data-lucide="check" class="w-4 h-4 text-white opacity-0 transition-opacity"></i>
+                    </div>
+                </button>
+
+                <!-- Comerciante (Amarillo) -->
+                <button id="btn-role-comerciante" onclick="toggleRole('COMERCIANTE')" class="role-btn group relative p-6 rounded-xl border-2 border-gray-700 hover:border-yellow-500 bg-[#0d1117] transition-all duration-300 flex flex-col items-center gap-4">
+                    <div class="w-16 h-16 rounded-full bg-yellow-900/30 flex items-center justify-center border-2 border-yellow-500/50 group-hover:border-yellow-400 group-hover:shadow-[0_0_20px_rgba(250,204,21,0.4)] transition-all">
+                        <i data-lucide="shopping-bag" class="w-8 h-8 text-yellow-400"></i>
+                    </div>
+                    <div class="text-center">
+                        <h3 class="font-bold text-yellow-400 text-lg">COMERCIANTE</h3>
+                        <div class="text-xs text-gray-500 mt-1">2 Objetos Tienda</div>
+                    </div>
+                    <div class="absolute top-4 right-4 w-6 h-6 rounded-full border border-gray-600 bg-gray-800 flex items-center justify-center check-indicator">
+                        <i data-lucide="check" class="w-4 h-4 text-white opacity-0 transition-opacity"></i>
+                    </div>
+                </button>
+
+                <!-- Ingeniero (Cyan) -->
+                <button id="btn-role-ingeniero" onclick="toggleRole('INGENIERO')" class="role-btn group relative p-6 rounded-xl border-2 border-gray-700 hover:border-cyan-500 bg-[#0d1117] transition-all duration-300 flex flex-col items-center gap-4">
+                    <div class="w-16 h-16 rounded-full bg-cyan-900/30 flex items-center justify-center border-2 border-cyan-500/50 group-hover:border-cyan-400 group-hover:shadow-[0_0_20px_rgba(34,211,238,0.4)] transition-all">
+                        <i data-lucide="wrench" class="w-8 h-8 text-cyan-400"></i>
+                    </div>
+                    <div class="text-center">
+                        <h3 class="font-bold text-cyan-400 text-lg">INGENIERO</h3>
+                        <div class="text-xs text-gray-500 mt-1">Support & Pasiva</div>
+                    </div>
+                    <div class="absolute top-4 right-4 w-6 h-6 rounded-full border border-gray-600 bg-gray-800 flex items-center justify-center check-indicator">
+                        <i data-lucide="check" class="w-4 h-4 text-white opacity-0 transition-opacity"></i>
+                    </div>
+                </button>
+
+                <!-- Mensajero (Lila) -->
+                <button id="btn-role-mensajero" onclick="toggleRole('MENSAJERO')" class="role-btn group relative p-6 rounded-xl border-2 border-gray-700 hover:border-purple-500 bg-[#0d1117] transition-all duration-300 flex flex-col items-center gap-4">
+                    <div class="w-16 h-16 rounded-full bg-purple-900/30 flex items-center justify-center border-2 border-purple-500/50 group-hover:border-purple-400 group-hover:shadow-[0_0_20px_rgba(192,132,252,0.4)] transition-all">
+                        <i data-lucide="send" class="w-8 h-8 text-purple-400"></i>
+                    </div>
+                    <div class="text-center">
+                        <h3 class="font-bold text-purple-400 text-lg">MENSAJERO</h3>
+                        <div class="text-xs text-gray-500 mt-1">Envíos Remotos</div>
+                    </div>
+                    <div class="absolute top-4 right-4 w-6 h-6 rounded-full border border-gray-600 bg-gray-800 flex items-center justify-center check-indicator">
+                        <i data-lucide="check" class="w-4 h-4 text-white opacity-0 transition-opacity"></i>
+                    </div>
+                </button>
+            </div>
+
+            <div class="flex justify-center">
+                <button id="btn-start-game" onclick="startGame()" disabled class="btn btn-secondary py-4 px-12 rounded-xl font-black text-xl tracking-widest opacity-50 cursor-not-allowed transition-all">
+                    INICIAR MISIÓN
+                </button>
+            </div>
+            <p id="player-count-label" class="text-center text-gray-500 mt-4 text-sm">Selecciona al menos 1 tripulante</p>
+        </div>
+        
+        <style>
+            .role-selected { background-color: rgba(255,255,255,0.05); }
+            .role-selected .check-indicator { background-color: #1f6feb; border-color: #1f6feb; }
+            .role-selected .check-indicator i { opacity: 1; }
+            /* Colores específicos para selección */
+            #btn-role-explorador.role-selected { border-color: #22c55e; box-shadow: 0 0 15px rgba(34, 197, 94, 0.2); }
+            #btn-role-comerciante.role-selected { border-color: #eab308; box-shadow: 0 0 15px rgba(234, 179, 8, 0.2); }
+            #btn-role-ingeniero.role-selected { border-color: #06b6d4; box-shadow: 0 0 15px rgba(6, 182, 212, 0.2); }
+            #btn-role-mensajero.role-selected { border-color: #a855f7; box-shadow: 0 0 15px rgba(168, 85, 247, 0.2); }
+        </style>
+    </div>
+
+    <!-- JUEGO PRINCIPAL (Oculto al inicio) -->
+    <div id="game-app" class="max-w-6xl mx-auto hidden">
         
         <!-- Header con Reset y Objetivo -->
         <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 border-b border-gray-700 pb-6 gap-6">
@@ -399,7 +524,10 @@
                     <i data-lucide="zap" class="w-6 h-6 text-purple-300 animate-pulse"></i>
                     <div class="flex flex-col">
                         <span class="text-xs text-purple-300 font-bold tracking-widest">OBJETIVO FINAL</span>
-                        <span class="text-2xl font-black font-tech">15 MW</span>
+                        <span id="goal-mw-display" class="text-2xl font-black font-tech">-- MW</span>
+                        <span id="goal-keys-display" class="text-[10px] text-cyan-300 font-bold uppercase border-t border-purple-500/30 pt-1 mt-1">
+                            -- LLAVES
+                        </span>
                     </div>
                 </div>
 
@@ -492,7 +620,7 @@
                             <i data-lucide="shopping-cart" class="w-6 h-6"></i>
                             Mercado
                         </h2>
-                        <div class="text-[10px] text-right space-y-1 font-mono text-gray-500">
+                        <div class="text-[10px] text-right space-y-1 font-mono text-gray-500" id="shop-rarity-display">
                             <div><span class="inline-block w-2 h-2 rounded-full bg-[#30363d] mr-1"></span>Común 60%</div>
                             <div><span class="inline-block w-2 h-2 rounded-full bg-[#0c2d6b] mr-1"></span>Raro 30%</div>
                             <div><span class="inline-block w-2 h-2 rounded-full bg-[#2e1a4d] mr-1"></span>Épico 10%</div>
@@ -500,7 +628,7 @@
                     </div>
                     
                     <div class="flex flex-col gap-3 mb-4">
-                        <select id="shop-level-select" class="w-full p-2 rounded-lg bg-[#0d1117] border border-gray-600 text-white text-sm font-bold focus:ring-1 focus:ring-green-500 outline-none">
+                        <select id="shop-level-select" onchange="updateShopRarityDisplay(this.value)" class="w-full p-2 rounded-lg bg-[#0d1117] border border-gray-600 text-white text-sm font-bold focus:ring-1 focus:ring-green-500 outline-none">
                             <option value="" disabled selected>Nivel de Tienda</option>
                             <option value="2">Nivel 2</option>
                             <option value="3">Nivel 3</option>
@@ -545,6 +673,36 @@
                     </ol>
                 </div>
 
+                <!-- Objetivo y Victoria -->
+                <div class="bg-[#0d1117] p-4 rounded-lg border-l-4 border-yellow-500">
+                    <h3 class="font-bold text-yellow-400 mb-2 flex items-center gap-2">
+                        <i data-lucide="trophy" class="w-4 h-4"></i>
+                        Condiciones de Victoria (El Big Crunch)
+                    </h3>
+                    <p class="text-gray-300 mb-2">Para ganar la partida, todos los jugadores vivos deben llegar al <strong class="text-white">Sistema Central (Nivel 1)</strong> cuando ocurra el Big Crunch final, cumpliendo los siguientes requisitos:</p>
+                    <ul class="list-disc list-inside space-y-2 ml-2 text-gray-300">
+                        <li>
+                            <strong class="text-purple-300">Energía (MW):</strong> Necesaria para estabilizar la nave.
+                            <ul class="list-circle list-inside ml-4 mt-1 text-xs text-gray-400">
+                                <li>1 Jugador: <strong class="text-white">10 MW</strong></li>
+                                <li>2 Jugadores: <strong class="text-white">20 MW</strong></li>
+                                <li>3 Jugadores: <strong class="text-white">30 MW</strong></li>
+                                <li>4 Jugadores: <strong class="text-white">40 MW</strong></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong class="text-cyan-300">Llave de la Singularidad:</strong> Necesaria para abrir el núcleo.
+                            <ul class="list-circle list-inside ml-4 mt-1 text-xs text-gray-400">
+                                <li>1-2 Jugadores: <strong class="text-white">1 Llave Completa</strong>.</li>
+                                <li>3-4 Jugadores: <strong class="text-white">2 Llaves Completas</strong> (La "O" y la Punta).</li>
+                            </ul>
+                        </li>
+                        <li class="border-t border-gray-700 pt-2 mt-2">
+                            <strong class="text-yellow-400">¡IMPORTANTE!</strong> Las Llaves de la Singularidad <strong class="text-white">aparecen en los sistemas de Nivel 5</strong> cuando estos se revelan. Debéis recogerlas <strong class="text-red-400">ANTES</strong> de que el Nivel 5 colapse, o se perderán para siempre (Game Over).
+                        </li>
+                    </ul>
+                </div>
+
                 <!-- Daño de Eventos -->
                 <div class="bg-[#0d1117] p-4 rounded-lg border-l-4 border-red-500">
                     <h3 class="font-bold text-red-400 mb-2 flex items-center gap-2">
@@ -555,8 +713,8 @@
                         <li><strong class="text-white">Eventos negativos:</strong> Si estás en el sistema/planeta afectado cuando se generan los eventos, recibes el daño inmediatamente.</li>
                         <li><strong class="text-white">Excepción - Daño al pasar:</strong> Los únicos casos donde recibes daño fuera de la generación de eventos son:
                             <ul class="list-circle list-inside ml-4 mt-1 space-y-1">
-                                <li><strong class="text-yellow-400">Planeta Rebelde:</strong> -1 de daño a 1 rango (al pasar por él).</li>
-                                <li><strong class="text-yellow-400">Basura Espacial:</strong> -1 de daño (al pasar por él).</li>
+                                <li><strong class="text-yellow-400">Planeta Rebelde:</strong> -1 de daño a 1 rango (al pasar cerca o por él).</li>
+                                <li><strong class="text-yellow-400">Basura Espacial:</strong> -2 de daño (al pasar por él).</li>
                             </ul>
                         </li>
                     </ul>
@@ -582,6 +740,9 @@
                     <p class="text-gray-300 ml-2">
                         Cuando un sistema planetario explota, <strong class="text-white">ya no se puede pasar por ahí</strong> a menos que tengas la habilidad <strong class="text-cyan-400">Llave Temporal</strong>.
                     </p>
+                    <p class="text-gray-300 ml-2 mt-2">
+                        <strong class="text-red-400">⚠️ MUERTE INMEDIATA:</strong> Si te explota estando dentro del sistema, <strong class="text-red-400">TE MATA DIRECTAMENTE</strong>, quedas muerto.
+                    </p>
                 </div>
 
                 <!-- Interacción y Compartir -->
@@ -593,7 +754,7 @@
                     <ul class="list-disc list-inside space-y-1 ml-2 text-gray-300">
                         <li><strong class="text-white">Movimiento Libre:</strong> Puedes realizar tantos movimientos como tu personaje permita (4 Explorador, 3 Comerciante). Durante este movimiento, puedes interactuar con <strong class="text-white">TODO</strong> lo que encuentres (Tiendas, Objetos).</li>
                         <li><strong class="text-white">Regla de Tiendas:</strong> Una vez abres una tienda específica, <strong class="text-red-400">TÚ no puedes volver a usar esa misma tienda este turno</strong> (pero otro jugador sí). Puedes encadenar varias tiendas diferentes en un mismo turno.</li>
-                        <li><strong class="text-white">Compartir (Default):</strong> Si otro jugador está en el mismo <strong class="text-white">Planeta</strong>, puedes transferirle Combustible o Cartas (según acuerdo).</li>
+                        <li><strong class="text-white">Compartir (Default):</strong> Si otro jugador está en el mismo <strong class="text-white">Planeta</strong>, puedes transferirle Combustible o Cartas (según acuerdo). <strong class="text-yellow-400">Se te quita de tu nave y se le da a la otra.</strong></li>
                     </ul>
                 </div>
 
@@ -613,6 +774,71 @@
                 </div>
             </div>
         </div>
+
+        <!-- Sección de Personajes -->
+        <div class="card p-6 rounded-2xl mt-6 border-t-4 border-indigo-500">
+            <h2 class="text-2xl font-bold mb-4 flex items-center gap-2 text-indigo-400">
+                <i data-lucide="users" class="w-6 h-6"></i>
+                Personajes
+            </h2>
+            
+            <div class="space-y-4 text-sm text-gray-300">
+                <!-- Explorador -->
+                <div class="bg-[#0d1117] p-4 rounded-lg border-l-4 border-green-500">
+                    <h3 class="font-bold text-green-400 mb-2 flex items-center gap-2">
+                        <i data-lucide="compass" class="w-4 h-4"></i>
+                        Explorador
+                    </h3>
+                    <ul class="list-disc list-inside space-y-1 ml-2 text-gray-300">
+                        <li><strong class="text-white">Movimiento:</strong> Te puedes mover <strong class="text-green-300">una casilla más por defecto</strong> (<strong class="text-white">4 movimientos en total</strong>).</li>
+                        <li><strong class="text-white">Combustible:</strong> Tu combustible baja solo <strong class="text-orange-400">1 de combustible por cada 2 movimientos</strong>. Si son impares baja como si fueran 2 (ej: 3 movimientos baja 2 de combustible, 1 movimiento baja 1 combustible).</li>
+                        <li><strong class="text-white">Vida a la mitad:</strong> Si baja a mitad de velocidad cuando su vida está a la mitad, entonces se mueve máximo <strong class="text-yellow-400">2 por defecto</strong> gastando <strong class="text-orange-400">1 de combustible por cada 2 movimientos</strong> igual.</li>
+                        <li><strong class="text-white">Recursos iniciales:</strong> <span class="text-orange-400">14 combustible</span> y <span class="text-red-400">10 vidas</span>.</li>
+                    </ul>
+                </div>
+
+                <!-- Comerciante -->
+                <div class="bg-[#0d1117] p-4 rounded-lg border-l-4 border-yellow-500">
+                    <h3 class="font-bold text-yellow-400 mb-2 flex items-center gap-2">
+                        <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+                        Comerciante
+                    </h3>
+                    <ul class="list-disc list-inside space-y-1 ml-2 text-gray-300">
+                        <li><strong class="text-white">Tiendas:</strong> Este puede coger <strong class="text-green-300">dos objetos de la tienda</strong>, todos los otros solo 1 objeto al visitar una tienda.</li>
+                        <li><strong class="text-white">Movimiento:</strong> Este y todos los otros se mueven <strong class="text-white">3 movimientos</strong> gastando <strong class="text-orange-400">combustible por movimiento</strong>.</li>
+                        <li><strong class="text-white">Vida a la mitad:</strong> Si le baja vida a la mitad entonces es eso de que se mueve máximo <strong class="text-yellow-400">2 movimientos</strong>.</li>
+                        <li><strong class="text-white">Recursos iniciales:</strong> <span class="text-orange-400">13 combustible</span> y <span class="text-red-400">10 vidas</span>.</li>
+                    </ul>
+                </div>
+
+                <!-- Ingeniero -->
+                <div class="bg-[#0d1117] p-4 rounded-lg border-l-4 border-cyan-500">
+                    <h3 class="font-bold text-cyan-400 mb-2 flex items-center gap-2">
+                        <i data-lucide="wrench" class="w-4 h-4"></i>
+                        Ingeniero
+                    </h3>
+                    <ul class="list-disc list-inside space-y-1 ml-2 text-gray-300">
+                        <li><strong class="text-white">Ayuda:</strong> Puede dar vida y combustible al resto de jugadores pero <strong class="text-cyan-300">sin gastar de sus recursos</strong>.</li>
+                        <li><strong class="text-white">Mismo planeta:</strong> Si se encuentra en la misma planeta les puede dar máximo <span class="text-red-400">5 de vida</span> y <span class="text-orange-400">18 de combustible</span>.</li>
+                        <li><strong class="text-white">PASIVA - Curación:</strong> Por cada movimiento sobrante de los 3 o 2 que pueda tener, se cura gastando <strong class="text-white">1 movimiento</strong>: <span class="text-red-400">+2HP</span> y <span class="text-orange-400">+3 Combustible</span>.</li>
+                        <li><strong class="text-white">Recursos iniciales:</strong> <span class="text-orange-400">15 combustible</span> y <span class="text-red-400">9 vidas</span>.</li>
+                    </ul>
+                </div>
+
+                <!-- Mensajero -->
+                <div class="bg-[#0d1117] p-4 rounded-lg border-l-4 border-purple-500">
+                    <h3 class="font-bold text-purple-400 mb-2 flex items-center gap-2">
+                        <i data-lucide="send" class="w-4 h-4"></i>
+                        Mensajero
+                    </h3>
+                    <ul class="list-disc list-inside space-y-1 ml-2 text-gray-300">
+                        <li><strong class="text-white">Transferencia a distancia:</strong> Este personaje puede dar <strong class="text-white">cartas, energía, combustible</strong>, sin necesidad de estar en la misma casilla pero <strong class="text-yellow-400">obviamente se lo resta a él mismo lo que da</strong>.</li>
+                        <li><strong class="text-white">Movimiento:</strong> Tiene <strong class="text-white">4 de movimiento</strong> pero el gasta de <strong class="text-orange-400">1 en 1 el combustible</strong>.</li>
+                        <li><strong class="text-white">Recursos iniciales:</strong> <span class="text-orange-400">15 combustible</span> y <span class="text-red-400">12 vidas</span>.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
             </div>
         </div>
 
@@ -625,12 +851,148 @@
         let nivelActual = 1;
         let faseJuego = 'EXPANSION'; 
         let turnosParaBigCrunch = 2;  
+        let activeRoles = []; // Stores selected roles: ['EXPLORADOR', 'COMERCIANTE', etc.]
+        let targetMW = 15;
+        let requiredKeys = 1;
         
         // ESTADO DEL MAPA (7x7 Grid)
         // Indices 0-48. Center is 24 (Row 3, Col 3).
         // Estructura: mapGrid[index] = { systemName: string, level: number, shops: number }
         let mapGrid = new Array(49).fill(null); 
 
+        // --- SETUP & GAME START LOGIC ---
+        
+        function updateShopRarityDisplay(val) {
+            const level = parseInt(val);
+            const container = document.getElementById('shop-rarity-display');
+            if (isNaN(level)) return; // Keep default if invalid
+
+            let html = '';
+            if (level === 5) {
+                // 100% Epico
+                html = `
+                    <div class="opacity-50 line-through"><span class="inline-block w-2 h-2 rounded-full bg-[#30363d] mr-1"></span>Común 0%</div>
+                    <div class="opacity-50 line-through"><span class="inline-block w-2 h-2 rounded-full bg-[#0c2d6b] mr-1"></span>Raro 0%</div>
+                    <div class="font-bold text-purple-300"><span class="inline-block w-2 h-2 rounded-full bg-[#2e1a4d] mr-1"></span>Épico 100%</div>
+                `;
+            } else if (level === 4) {
+                // 50% Com, 30% Rar, 20% Epi
+                html = `
+                    <div><span class="inline-block w-2 h-2 rounded-full bg-[#30363d] mr-1"></span>Común 50%</div>
+                    <div><span class="inline-block w-2 h-2 rounded-full bg-[#0c2d6b] mr-1"></span>Raro 30%</div>
+                    <div class="text-purple-300"><span class="inline-block w-2 h-2 rounded-full bg-[#2e1a4d] mr-1"></span>Épico 20%</div>
+                `;
+            } else {
+                // 60% Com, 30% Rar, 10% Epi
+                html = `
+                    <div><span class="inline-block w-2 h-2 rounded-full bg-[#30363d] mr-1"></span>Común 60%</div>
+                    <div><span class="inline-block w-2 h-2 rounded-full bg-[#0c2d6b] mr-1"></span>Raro 30%</div>
+                    <div><span class="inline-block w-2 h-2 rounded-full bg-[#2e1a4d] mr-1"></span>Épico 10%</div>
+                `;
+            }
+            container.innerHTML = html;
+        }
+
+        function toggleRole(role) {
+            const btn = document.getElementById(`btn-role-${role.toLowerCase()}`);
+            
+            if (activeRoles.includes(role)) {
+                activeRoles = activeRoles.filter(r => r !== role);
+                btn.classList.remove('role-selected');
+            } else {
+                if (activeRoles.length < 4) {
+                    activeRoles.push(role);
+                    btn.classList.add('role-selected');
+                }
+            }
+            
+            // Update UI
+            const startBtn = document.getElementById('btn-start-game');
+            const countLabel = document.getElementById('player-count-label');
+            const count = activeRoles.length;
+            
+            if (count > 0) {
+                startBtn.disabled = false;
+                startBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                startBtn.classList.add('shadow-lg', 'hover:scale-105');
+                countLabel.innerHTML = `<span class="text-green-400 font-bold">${count}</span> Tripulantes Listos`;
+            } else {
+                startBtn.disabled = true;
+                startBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                startBtn.classList.remove('shadow-lg', 'hover:scale-105');
+                countLabel.textContent = "Selecciona al menos 1 tripulante";
+            }
+        }
+
+        function startGame() {
+            if (activeRoles.length === 0) return;
+            
+            // 1. Calculate Goals
+            const playerCount = activeRoles.length;
+            targetMW = playerCount * 10; // 10, 20, 30, 40 MW
+            requiredKeys = (playerCount >= 3) ? 2 : 1;
+            
+            // 2. Update UI Displays
+            document.getElementById('goal-mw-display').textContent = `${targetMW} MW`;
+            document.getElementById('goal-keys-display').textContent = `${requiredKeys} LLAVE${requiredKeys > 1 ? 'S' : ''} SINGULARIDAD`;
+            
+            // 3. Switch Screens
+            document.getElementById('setup-screen').classList.add('hidden');
+            document.getElementById('game-app').classList.remove('hidden');
+            
+            // 4. Init Game
+            resetGameInternal(false); // Start without confirming
+        }
+
+        // Modified Reset (Internal)
+        function resetGameInternal(askConfirm = true) {
+             if(askConfirm && !confirm("¿Seguro que quieres reiniciar?")) return;
+            
+            nivelActual = 1;
+            faseJuego = 'EXPANSION';
+            turnosParaBigCrunch = 2;
+            initMap(); // Reset map
+            updateUIState();
+            
+            document.getElementById('map-output').innerHTML = "<p class='font-bold text-yellow-500 mb-1'>ESTADO</p>Nivel 1 Iniciado.";
+            document.getElementById('shop-locations-details').textContent = "Esperando generación...";
+            document.getElementById('event-output').innerHTML = "<div class='text-center italic text-gray-500 my-auto'>Pulsa para generar los eventos...</div>";
+            document.getElementById('shop-inventory-container').innerHTML = '<div class="col-span-full text-center py-8 text-gray-500 border border-dashed border-gray-700 rounded-xl text-xs">Genera la tienda para ver objetos.</div>';
+        }
+
+        function resetGame() {
+            if(!confirm("¿Reiniciar misión? Volverás al menú principal.")) return;
+            
+            // 1. Limpiar visualmente el juego (aunque se oculte)
+            nivelActual = 1;
+            faseJuego = 'EXPANSION';
+            turnosParaBigCrunch = 2;
+            initMap();
+            
+            // 2. Ocultar Juego / Mostrar Menú
+            document.getElementById('game-app').classList.add('hidden');
+            document.getElementById('setup-screen').classList.remove('hidden');
+            
+            // 3. Limpiar Estado Interno
+            activeRoles = [];
+            
+            // 4. Resetear UI de Selección de Roles
+            document.querySelectorAll('.role-btn').forEach(btn => {
+                btn.classList.remove('role-selected');
+            });
+            
+            // 5. Resetear Botón de Inicio y Texto
+            const startBtn = document.getElementById('btn-start-game');
+            if(startBtn) {
+                startBtn.disabled = true;
+                startBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                startBtn.classList.remove('shadow-lg', 'hover:scale-105');
+            }
+            
+            const countLabel = document.getElementById('player-count-label');
+            if(countLabel) countLabel.textContent = "Selecciona al menos 1 tripulante";
+        }
+        
         // --- DATA STRUCTURES ---
         
         // Mapeo inverso para busqueda rapida de sistema por planeta
@@ -849,16 +1211,32 @@
             // Nivel 5 solo usa 2 slots aleatorios de los 4 disponibles
             if (level === 5) {
                 const pickedSlots = shuffleArray(slots).slice(0, 2);
+                
+                // LOGIC FOR KEYS (LLAVES SINGULARIDAD)
+                // If 1-2 players -> 1 Key total. If 3-4 players -> 2 Keys total.
+                const totalKeys = (activeRoles.length >= 3) ? 2 : 1;
+                
                 for(let i=0; i<2; i++) {
                     // Initialize planet states for specific tracking
                     const sysName = sistemas[i];
                     const planetas = SYSTEM_PLANET_RELATION[sysName] || [];
                     const planetStates = {};
-                    planetas.forEach(p => {
-                        planetStates[p] = { shops: 0, eventObjects: 0, eventPortals: 0, eventNegative: 0 };
+                    
+                    // Decide if this system gets a Key
+                    let hasKey = false;
+                    if (totalKeys === 2) hasKey = true; // Both systems get a key
+                    else if (totalKeys === 1 && i === 0) hasKey = true; // Only first system gets key
+                    
+                    planetas.forEach((p, idx) => {
+                        planetStates[p] = { shops: 0, eventObjects: 0, eventPortals: 0, eventNegative: 0, hasKey: false };
                     });
                     
-                        mapGrid[pickedSlots[i]] = { 
+                    if (hasKey) {
+                        const randomPlanet = planetas[Math.floor(Math.random() * planetas.length)];
+                        planetStates[randomPlanet].hasKey = true;
+                    }
+                    
+                    mapGrid[pickedSlots[i]] = { 
                         systemName: sysName, 
                         level: 5, 
                         systemDanger: false,
@@ -866,6 +1244,11 @@
                         planetStates: planetStates 
                     };
                 }
+                
+                // NOTIFICATION FOR KEYS
+                const mapOutput = document.getElementById('map-output');
+                mapOutput.innerHTML += `<br><span class="text-yellow-400 font-bold animate-pulse">¡DETECTADA LLAVE SINGULARIDAD!</span><br><span class="text-[10px]">Recógela antes del colapso.</span>`;
+
             } else {
                 // Niveles 2, 3, 4 llenan todos sus slots
                 for(let i=0; i<slots.length; i++) {
@@ -1125,12 +1508,14 @@
                     // Planets Nodes
                     let nodesHTML = '';
                     nodes.forEach(p => {
-                        const pState = data.planetStates && data.planetStates[p.id] ? data.planetStates[p.id] : { shops:0, eventObjects:0, eventPortals:0, eventNegative:0, rebel:0, garbage:0, boss:null };
+                        const pState = data.planetStates && data.planetStates[p.id] ? data.planetStates[p.id] : { shops:0, eventObjects:0, eventPortals:0, eventNegative:0, rebel:0, garbage:0, boss:null, hasKey:false };
                         
                         let badges = '';
                         if(pState.boss === 'ESTELAR') badges += `<div class="planet-badge badge-boss badge-boss-stellar">E</div>`;
                         if(pState.boss === 'OSCURO') badges += `<div class="planet-badge badge-boss badge-boss-dark">O</div>`;
                         
+                        if(pState.hasKey) badges += `<div class="planet-badge badge-key" title="Llave Singularidad">🗝️</div>`;
+
                         if(pState.shops > 0) badges += `<div class="planet-badge badge-shop">${pState.shops}</div>`;
                         if(pState.eventObjects > 0) badges += `<div class="planet-badge badge-event">!</div>`;
                         if(pState.eventPortals > 0) badges += `<div class="planet-badge badge-portal">P</div>`;
@@ -1162,20 +1547,7 @@
         }
 
         // --- CORE FUNCTIONS ---
-
-        function resetGame() {
-            if(!confirm("¿Seguro que quieres reiniciar?")) return;
-            nivelActual = 1;
-            faseJuego = 'EXPANSION';
-            turnosParaBigCrunch = 2;
-            initMap(); // Reset map
-            updateUIState();
-            
-            document.getElementById('map-output').innerHTML = "<p class='font-bold text-yellow-500 mb-1'>ESTADO</p>Nivel 1 Reiniciado.";
-            document.getElementById('shop-locations-details').textContent = "Esperando generación...";
-            document.getElementById('event-output').innerHTML = "<div class='text-center italic text-gray-500 my-auto'>Pulsa para generar los eventos...</div>";
-            document.getElementById('shop-inventory-container').innerHTML = '<div class="col-span-full text-center py-8 text-gray-500 border border-dashed border-gray-700 rounded-xl text-xs">Genera la tienda para ver objetos.</div>';
-        }
+        // (resetGame definition moved to SETUP section)
 
         function updateUIState() {
             const levelEl = document.getElementById('current-level');
@@ -1223,7 +1595,13 @@
                     let msg = `Nivel ${nivelActual} Desbloqueado.`;
                     if (nivelActual === 5) {
                         faseJuego = 'CUENTA_ATRAS';
-                        msg += " ¡BIG CRUNCH INICIADO!";
+                        msg += " <span class='text-red-400 font-bold'>¡BIG CRUNCH INICIADO!</span>";
+                        
+                        // Mensaje explicativo de llaves
+                        const keysNeeded = (activeRoles.length >= 3) ? 2 : 1;
+                        msg += `<br><span class="text-yellow-300 text-[10px] mt-1 block border-t border-gray-700 pt-1">
+                            OBJETIVO: Recuperad <strong class="text-white">${keysNeeded} Llave${keysNeeded>1?'s':''} de Singularidad</strong> de los sistemas de Nivel 5 antes de que colapsen.
+                        </span>`;
                     }
                     mapOutput.innerHTML = `<p class="font-bold text-green-400 mb-1">EXPANSIÓN</p>${msg}`;
                     updateUIState();
@@ -1555,28 +1933,55 @@
                 `;
             }
 
-            // --- 2. EVENTO PERSONAL (SIEMPRE) ---
-            let pEventBase;
-            const randP = Math.random();
-            if (randP < 0.10) {
-                 pEventBase = EVENTOS_PERSONALES_POOL.find(e => e.id === 'Interferencias');
-            } else {
-                 const commons = EVENTOS_PERSONALES_POOL.filter(e => e.rareza !== 'epico');
-                 pEventBase = getRandomElement(commons);
+            // --- 2. EVENTO PERSONAL (ADAPTATIVO) ---
+            
+            // Lógica según número de jugadores activos (activeRoles)
+            // 1 Jugador: Sin eventos personales.
+            // 2 Jugadores: 1 Evento Personal (afecta a 1).
+            // 3 Jugadores: 50% 1 Evento, 50% 2 Eventos (afectando a distintos).
+            // 4 Jugadores: Siempre 2 Eventos (afectando a distintos).
+
+            const numPlayers = activeRoles.length;
+            let numPersonalEvents = 0;
+
+            if (numPlayers === 1) {
+                numPersonalEvents = 0;
+            } else if (numPlayers === 2) {
+                numPersonalEvents = 1;
+            } else if (numPlayers === 3) {
+                numPersonalEvents = Math.random() < 0.5 ? 1 : 2;
+            } else if (numPlayers >= 4) {
+                numPersonalEvents = 2;
             }
-            
-            // Determinar rol afectado (50% Explorador, 50% Comerciante)
-            const rolAfectado = Math.random() < 0.5 ? "EXPLORADOR" : "COMERCIANTE";
-            const pDesc = pEventBase.desc.replace('{ROLE}', rolAfectado);
-            
-            eventsHTML += `
-                <div class="event-card bg-orange-900/20 border-l-4 border-orange-500">
-                    <div class="event-section-title text-orange-400">
-                        <i data-lucide="user-x" class="w-4 h-4"></i> ${pEventBase.id.replace(/_/g, ' ')}
-                    </div>
-                    <p class="text-xs text-gray-300 leading-relaxed">${pDesc}</p>
-                </div>
-            `;
+
+            if (numPersonalEvents > 0) {
+                // Seleccionar víctimas únicas de los roles activos
+                const shuffledRoles = shuffleArray([...activeRoles]); 
+                const victims = shuffledRoles.slice(0, numPersonalEvents);
+
+                victims.forEach(victimRole => {
+                    let pEventBase;
+                    const randP = Math.random();
+                    // Interferencias (Epico, 10%)
+                    if (randP < 0.10) {
+                        pEventBase = EVENTOS_PERSONALES_POOL.find(e => e.id === 'Interferencias');
+                    } else {
+                        const commons = EVENTOS_PERSONALES_POOL.filter(e => e.rareza !== 'epico');
+                        pEventBase = getRandomElement(commons);
+                    }
+                    
+                    const pDesc = pEventBase.desc.replace('{ROLE}', victimRole);
+                    
+                    eventsHTML += `
+                        <div class="event-card bg-orange-900/20 border-l-4 border-orange-500">
+                            <div class="event-section-title text-orange-400">
+                                <i data-lucide="user-x" class="w-4 h-4"></i> ${pEventBase.id.replace(/_/g, ' ')}
+                            </div>
+                            <p class="text-xs text-gray-300 leading-relaxed">${pDesc}</p>
+                        </div>
+                    `;
+                });
+            }
 
             // Función Helper para Negativo General
             function generateNegativeGeneralHTML() {
@@ -1673,6 +2078,13 @@
         window.onload = () => {
             initMap();
             updateUIState();
+            
+            // Protección contra recarga accidental (F5)
+            window.addEventListener('beforeunload', (e) => {
+                e.preventDefault();
+                e.returnValue = ''; // Standard for Chrome/Firefox
+                return ''; // Legacy
+            });
             
             // Registrar Service Worker para PWA
             if ('serviceWorker' in navigator) {
