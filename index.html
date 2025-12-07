@@ -914,11 +914,11 @@
                     <div class="text-purple-300"><span class="inline-block w-2 h-2 rounded-full bg-[#2e1a4d] mr-1"></span>Épico 20%</div>
                 `;
             } else if (level === 2) {
-                // 65% Com, 30% Rar, 5% Epi
+                // 70% Com, 30% Rar, 0% Epi
                 html = `
-                    <div><span class="inline-block w-2 h-2 rounded-full bg-[#30363d] mr-1"></span>Común 65%</div>
+                    <div><span class="inline-block w-2 h-2 rounded-full bg-[#30363d] mr-1"></span>Común 70%</div>
                     <div><span class="inline-block w-2 h-2 rounded-full bg-[#0c2d6b] mr-1"></span>Raro 30%</div>
-                    <div><span class="inline-block w-2 h-2 rounded-full bg-[#2e1a4d] mr-1"></span>Épico 5%</div>
+                    <div class="opacity-50 line-through"><span class="inline-block w-2 h-2 rounded-full bg-[#2e1a4d] mr-1"></span>Épico 0%</div>
                 `;
             } else {
                 // Niveles 1 y 3: 60% Com, 30% Rar, 10% Epi
@@ -1145,7 +1145,7 @@
                 { id: 'Habilidad_ProtecciónPlanetaria', rareza: 'epico', niveles: [4, 5], desc: 'PASIVA: Protege hasta 1 de daño por turno.' },
                 { id: 'Habilidad_LlaveTemporal', rareza: 'epico', niveles: [3, 4], desc: 'PASIVA: Permite pasar por sistemas planetarios explotados.' },
                 { id: 'Habilidad_LlaveTemporal', rareza: 'raro', niveles: [4, 5], desc: 'PASIVA: Permite pasar por sistemas planetarios explotados.' },
-                { id: 'Habilidad_EstabilizadorEstelar', rareza: 'epico', niveles: [2, 3], desc: 'ACTIVA: Evita la explosión inminente de un sistema planetario (un solo uso, donde sea del universo).' },
+                { id: 'Habilidad_EstabilizadorEstelar', rareza: 'epico', niveles: [3], desc: 'ACTIVA: Evita la explosión inminente de un sistema planetario (un solo uso, donde sea del universo).' },
                 { id: 'Habilidad_EstabilizadorEstelar', rareza: 'raro', niveles: [4, 5], desc: 'ACTIVA: Evita la explosión inminente de un sistema planetario (un solo uso, donde sea del universo).' },
                 { id: 'Habilidad_CrearPortal', rareza: 'epico', niveles: [5], desc: 'ACTIVA: Crea un portal de 2 puertas (2 planetas) donde tú quieras del universo.', legendaria: true, maxApariciones: 1 },
                 { id: 'Habilidad_DisfrazRebelde', rareza: 'raro', niveles: [3, 4, 5], desc: 'PASIVA: No te afectan los planetas rebeldes.' },
@@ -1188,10 +1188,10 @@
                 probRaro = 0.30;
                 probEpico = 0.20;
             } else if (nivel === 2) {
-                // Nivel 2: 65% común, 30% raro, 5% épico
-                probComun = 0.65;
+                // Nivel 2: 70% común, 30% raro, 0% épico
+                probComun = 0.70;
                 probRaro = 0.30;
-                probEpico = 0.05;
+                probEpico = 0.0;
             } else {
                 // Niveles 1 y 3: 60% común, 30% raro, 10% épico
                 probComun = RAREZA_PROBABILIDAD.comun;
@@ -2173,8 +2173,19 @@
                 let targetPlanetName = null; 
 
                 if (evName === 'Evento_Explosion_Sistema') {
-                    // Filtrar Sistema Tierra
-                    let validTargets = sistemasActivos.filter(s => s !== 'Sistema_Tierra');
+                    // Filtrar Sistema Tierra y Nivel 2 (hasta que empiece Big Crunch)
+                    let validTargets = sistemasActivos.filter(s => {
+                        if (s === 'Sistema_Tierra') return false;
+                        
+                        // Proteger Nivel 2 hasta que empiece Big Crunch
+                        if (faseJuego !== 'BIG_CRUNCH') {
+                            const cellIndex = mapGrid.findIndex(c => c && c.systemName === s);
+                            if (cellIndex !== -1 && mapGrid[cellIndex].level === 2) return false;
+                        }
+                        
+                        return true;
+                    });
+                    
                     if(validTargets.length === 0) validTargets = sistemasActivos; // Fallback raro
                     
                     const target = getRandomElement(validTargets); 
