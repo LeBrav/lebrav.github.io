@@ -2176,12 +2176,12 @@
                 let targetPlanetName = null; 
 
                 if (evName === 'Evento_Explosion_Sistema') {
-                    // Filtrar Sistema Tierra y Nivel 2 (hasta que empiece Big Crunch)
+                    // Filtrar Sistema Tierra y Nivel 2 (hasta que empiece Big Crunch - CUENTA_ATRAS)
                     let validTargets = sistemasActivos.filter(s => {
                         if (s === 'Sistema_Tierra') return false;
                         
-                        // Proteger Nivel 2 hasta que empiece Big Crunch
-                        if (faseJuego !== 'BIG_CRUNCH') {
+                        // Proteger Nivel 2 durante EXPANSION (antes de que se inicie el Big Crunch)
+                        if (faseJuego === 'EXPANSION') {
                             const cellIndex = mapGrid.findIndex(c => c && c.systemName === s);
                             if (cellIndex !== -1 && mapGrid[cellIndex].level === 2) return false;
                         }
@@ -2189,13 +2189,21 @@
                         return true;
                     });
                     
-                    if(validTargets.length === 0) validTargets = sistemasActivos; // Fallback raro
-                    
-                    const target = getRandomElement(validTargets); 
-                    targetSysName = target;
-                    desc = `Sistema <strong class="text-white">${target.replace('Sistema_','')}</strong> explotará.`;
-                    icon = "flame";
-                } else if (evName === 'Evento_Sistema_Infectado') {
+                    // Si no hay objetivos válidos para explosión (ej: estamos en nivel 2 y todo está protegido),
+                    // CAMBIAR A INFECTADO en lugar de forzar explosión
+                    if(validTargets.length === 0) {
+                        evName = 'Evento_Sistema_Infectado'; // Switch event type
+                        // Continue to Infected logic below...
+                    } else {
+                        const target = getRandomElement(validTargets); 
+                        targetSysName = target;
+                        desc = `Sistema <strong class="text-white">${target.replace('Sistema_','')}</strong> explotará.`;
+                        icon = "flame";
+                    }
+                } 
+                
+                // NOTA: Usamos if separado, no else if, porque evName puede haber cambiado arriba
+                if (evName === 'Evento_Sistema_Infectado') {
                     const target = getRandomElement(sistemasActivos); 
                     targetSysName = target;
                     desc = `Sistema <strong class="text-white">${target.replace('Sistema_','')}</strong> infectado (Daño 1/turno).`;
