@@ -626,21 +626,29 @@
                         
                         <!-- Info Panel -->
                         <div class="w-full md:w-1/3 flex flex-col gap-4">
-                            <div id="map-output" class="text-xs text-gray-400 bg-[#0d1117] p-3 rounded-lg border border-gray-700 h-full">
+                            <div id="map-output" class="text-xs text-gray-400 bg-[#0d1117] p-3 rounded-lg border border-gray-700">
                                 <p class="font-bold text-yellow-500 mb-1">ESTADO</p>
                                 Nivel 1 Activo.
                             </div>
                             
+                            <!-- Event Summary -->
+                            <div id="event-summary" class="text-xs bg-[#0d1117] p-3 rounded-lg border border-gray-700 max-h-60 overflow-y-auto custom-scrollbar hidden">
+                                <p class="font-bold text-green-400 mb-2 flex items-center gap-1">
+                                    <i data-lucide="zap" class="w-3 h-3"></i> EVENTOS ACTIVOS
+                                </p>
+                                <div id="event-summary-content"></div>
+                            </div>
+                            
                             <!-- Shop Generator Button embedded here for context -->
-                            <div class="border-t border-gray-700 pt-4 mt-auto">
+                            <div class="border-t border-gray-700 pt-4">
                                 <h3 class="text-sm font-bold text-blue-400 mb-2 flex items-center gap-2">
                                     <i data-lucide="map-pin" class="w-4 h-4"></i> Tiendas
                                 </h3>
-                                <button onclick="generateShopLocations()" class="btn btn-secondary w-full py-2 rounded-lg text-xs font-bold text-gray-300 mb-2">
+                                <button onclick="generateShopLocations()" class="btn btn-secondary w-full py-2 rounded-lg text-xs font-bold text-gray-300">
                                     UBICAR TIENDAS
                                 </button>
-                                <div id="shop-locations-details" class="text-xs text-gray-500 italic h-auto max-h-60 overflow-y-auto custom-scrollbar">
-                                    Esperando generación...
+                                <div id="shop-locations-details" class="text-xs text-gray-500 italic h-auto max-h-60 overflow-y-auto custom-scrollbar hidden">
+                                    <!-- Oculto - solo marca en el mapa -->
                                 </div>
                             </div>
                         </div>
@@ -1030,9 +1038,9 @@
             updateUIState();
             
             document.getElementById('map-output').innerHTML = "<p class='font-bold text-yellow-500 mb-1'>ESTADO</p>Nivel 1 Iniciado.";
-            document.getElementById('shop-locations-details').textContent = "Esperando generación...";
             document.getElementById('event-output').innerHTML = "<div class='text-center italic text-gray-500 my-auto'>Pulsa para generar los eventos...</div>";
             document.getElementById('shop-inventory-container').innerHTML = '<div class="col-span-full text-center py-8 text-gray-500 border border-dashed border-gray-700 rounded-xl text-xs">Genera la tienda para ver objetos.</div>';
+            document.getElementById('event-summary').classList.add('hidden');
         }
 
         function resetGame() {
@@ -1835,7 +1843,7 @@
             }
 
             if (planetasActivos.length === 0) {
-                detailOut.textContent = "Nivel 1: Sin tiendas.";
+                // Solo marcar en el mapa, no mostrar texto
                 renderMap();
                 return;
             }
@@ -1898,7 +1906,8 @@
             });
             locationListHTML += '</ul>';
 
-            detailOut.innerHTML = locationListHTML;
+            // No mostrar lista de texto - solo marcar en el mapa
+            // detailOut.innerHTML = locationListHTML;
             renderMap(); 
         }
 
@@ -2060,6 +2069,17 @@
                  const especial = generateItem('Especial', shopLevel);
                  if(especial) itemsData.push(especial); 
             }
+            
+            // Ordenar: Habilidades y Especiales (cartas) primero, luego el resto
+            itemsData.sort((a, b) => {
+                const aEsCarta = a && (a.tipoObjeto === 'Habilidad' || a.tipoObjeto === 'Especial');
+                const bEsCarta = b && (b.tipoObjeto === 'Habilidad' || b.tipoObjeto === 'Especial');
+                
+                if (aEsCarta && !bEsCarta) return -1; // a va primero
+                if (!aEsCarta && bEsCarta) return 1;  // b va primero
+                return 0; // mantener orden original si ambos son cartas o ambos no son cartas
+            });
+            
             container.innerHTML = itemsData.map(item => createItemCardHTML(item)).join('');
             lucide.createIcons();
         }
@@ -2098,11 +2118,16 @@
 
             if (nivelActual === 1) {
                 out.innerHTML = "<p class='text-gray-400 text-center text-sm'>No hay eventos en el Nivel 1.</p>";
+                document.getElementById('event-summary').classList.add('hidden');
                 renderMap();
                 return;
             }
 
             let eventsHTML = '';
+            
+            // Variables para el resumen
+            let eventObject = null;
+            let eventObjectPlanet = null;
 
             // 1. POSITIVO (Siempre 1)
             // Portales 40%, Objetos 60%
@@ -2136,6 +2161,10 @@
                 } else {
                     randomObj = getRandomElement(EVENTO_OBJETOS_POOL);
                 }
+                
+                // Guardar para el resumen
+                eventObject = randomObj;
+                eventObjectPlanet = targetPlanet;
 
                 const cardHTML = createItemCardHTML(randomObj, true);
                 
@@ -2313,6 +2342,68 @@
             }
 
             out.innerHTML = eventsHTML;
+            
+            // Crear resumen para el panel del mapa - SOLO Objeto y Evento Personal
+            const summaryContainer = document.getElementById('event-summary');
+            const summaryContent = document.getElementById('event-summary-content');
+            
+            if (eventsHTML.trim() === '') {
+                summaryContainer.classList.add('hidden');
+            } else {
+                summaryContainer.classList.remove('hidden');
+                
+                // Extraer información clave de los eventos para el resumen
+                let summaryHTML = '';
+                
+                // Buscar SOLO evento de objeto (no portales)
+                if (!isPortal && eventObject && eventObjectPlanet) {
+                    // Obtener info del objeto directamente
+                    const itemName = eventObject.id.replace(/_/g, ' ');
+                    let extraInfo = '';
+                    
+                    // Agregar info adicional según el tipo
+                    if (eventObject.potenciaValor) {
+                        extraInfo = ` <span class="text-yellow-400">(${eventObject.potenciaValor})</span>`;
+                    } else if (eventObject.desc) {
+                        if (eventObject.desc.includes('+')) {
+                            const valueMatch = eventObject.desc.match(/\+(\d+)/);
+                            if (valueMatch) {
+                                if (eventObject.desc.includes('HP')) {
+                                    extraInfo = ` <span class="text-red-400">(+${valueMatch[1]})</span>`;
+                                } else if (eventObject.desc.includes('Combustible')) {
+                                    extraInfo = ` <span class="text-orange-400">(+${valueMatch[1]})</span>`;
+                                }
+                            }
+                        }
+                    }
+                    
+                    summaryHTML += `<div class="mb-2 pb-2 border-b border-gray-700">
+                        <p class="text-green-400 font-bold flex items-center gap-1">
+                            <i data-lucide="gift" class="w-3 h-3"></i> Objeto
+                        </p>
+                        <p class="text-[10px] text-gray-300 mt-1">${eventObjectPlanet}: <span class="text-cyan-300">${itemName}</span>${extraInfo}</p>
+                    </div>`;
+                }
+                
+                // Buscar eventos personales
+                const personalMatches = eventsHTML.matchAll(/<div class="event-section-title text-orange-400">.*?<\/i> (.*?)<\/div>.*?<p class="text-xs text-gray-300 leading-relaxed">(.*?)<\/p>/gs);
+                for (const match of personalMatches) {
+                    summaryHTML += `<div class="mb-2 pb-2 border-b border-gray-700 last:border-b-0 last:pb-0 last:mb-0">
+                        <p class="text-orange-400 font-bold flex items-center gap-1">
+                            <i data-lucide="user-x" class="w-3 h-3"></i> ${match[1]}
+                        </p>
+                        <p class="text-[10px] text-gray-300 mt-1">${match[2]}</p>
+                    </div>`;
+                }
+                
+                // Si no hay nada para mostrar, ocultar el panel
+                if (summaryHTML === '') {
+                    summaryContainer.classList.add('hidden');
+                } else {
+                    summaryContent.innerHTML = summaryHTML;
+                }
+            }
+            
             renderMap(); 
             lucide.createIcons();
         }
