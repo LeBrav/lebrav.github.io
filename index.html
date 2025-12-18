@@ -1357,7 +1357,7 @@
         const SYSTEM_LAYOUTS_CONFIG = {
             // NIVEL 1
             'Sistema_Tierra': {
-                nodes: [ { id: 'Planeta_Tierra_Base', x: 50, y: 50 } ],
+                nodes: [ { id: 'Planeta_Tierra_Base', x: 50, y: 75 } ],
                 connections: [],
                 exits: { N: 'Planeta_Tierra_Base', E: 'Planeta_Tierra_Base', S: 'Planeta_Tierra_Base', W: 'Planeta_Tierra_Base' }
             },
@@ -1365,36 +1365,36 @@
             // NIVEL 2
             'Sistema_Fuego': {
                 nodes: [
-                    { id: 'Planeta_Llamas', x: 50, y: 20 }, // Arriba
-                    { id: 'Planeta_Chispa', x: 80, y: 60 }, // Der
-                    { id: 'Planeta_Magma', x: 20, y: 60 }   // Izq
+                    { id: 'Planeta_Llamas', x: 63, y: 17 }, // Arriba
+                    { id: 'Planeta_Chispa', x: 83, y: 65 }, // Der
+                    { id: 'Planeta_Magma', x: 30, y: 73 }   // Izq
                 ],
-                connections: [['Planeta_Llamas','Planeta_Chispa'], ['Planeta_Chispa','Planeta_Magma'], ['Planeta_Magma','Planeta_Llamas']],
+                connections: [],
                 exits: { N: 'Planeta_Llamas', E: 'Planeta_Chispa', S: 'Planeta_Chispa', W: 'Planeta_Magma' }
             },
             'Sistema_Viento': {
                 nodes: [
-                    { id: 'Planeta_Burbuja', x: 30, y: 40 }, // Izq Arriba
-                    { id: 'Planeta_Torrnado', x: 70, y: 60 } // Der Abajo
+                    { id: 'Planeta_Burbuja', x: 26, y: 30 }, // Izq Arriba
+                    { id: 'Planeta_Torrnado', x: 80, y: 70 } // Der Abajo
                 ],
-                connections: [['Planeta_Burbuja', 'Planeta_Torrnado']],
+                connections: [],
                 exits: { N: 'Planeta_Burbuja', E: 'Planeta_Torrnado', S: 'Planeta_Torrnado', W: 'Planeta_Burbuja' }
             },
             'Sistema_Tierra_Elemental': { // "sistema tierra" en imagen
                 nodes: [
-                    { id: 'Planeta_Roca', x: 70, y: 30 },    // Arriba Der
-                    { id: 'Planeta_Botanico', x: 20, y: 40 },// Izq
+                    { id: 'Planeta_Roca', x: 75, y: 20 },    // Arriba Der
+                    { id: 'Planeta_Botanico', x: 16, y: 32 },// Izq
                     { id: 'Planeta_Barro', x: 50, y: 80 }    // Abajo
                 ],
-                connections: [['Planeta_Roca','Planeta_Barro'], ['Planeta_Barro','Planeta_Botanico'], ['Planeta_Botanico','Planeta_Roca']],
+                connections: [],
                 exits: { N: 'Planeta_Roca', E: 'Planeta_Roca', S: 'Planeta_Barro', W: 'Planeta_Botanico' }
             },
             'Sistema_Agua': {
                 nodes: [
-                    { id: 'Planeta_Olas', x: 40, y: 30 }, // Arriba Izq
-                    { id: 'Planeta_Gota', x: 60, y: 70 }  // Abajo Der
+                    { id: 'Planeta_Olas', x: 29, y: 22 }, // Arriba Izq
+                    { id: 'Planeta_Gota', x: 41, y: 75 }  // Abajo Der
                 ],
-                connections: [['Planeta_Olas', 'Planeta_Gota']],
+                connections: [],
                 exits: { N: 'Planeta_Olas', E: 'Planeta_Olas', S: 'Planeta_Gota', W: 'Planeta_Olas' }
             },
 
@@ -1403,82 +1403,82 @@
                 nodes: [
                     { id: 'Planeta_Hueso', x: 20, y: 25 },    // Arriba Izq
                     { id: 'Planeta_Fosil', x: 80, y: 25 },    // Arriba Der
-                    { id: 'Planeta_HuevoDino', x: 50, y: 70 } // Abajo
+                    { id: 'Planeta_HuevoDino', x: 50, y: 78 } // Abajo
                 ],
-                connections: [['Planeta_Hueso','Planeta_Fosil'], ['Planeta_Fosil','Planeta_HuevoDino'], ['Planeta_HuevoDino','Planeta_Hueso']],
+                connections: [],
                 exits: { N: 'Planeta_Hueso', E: 'Planeta_Fosil', S: 'Planeta_HuevoDino', W: 'Planeta_Hueso' }
             },
             'Sistema_FarWest': {
                 nodes: [
-                    { id: 'Planeta_Dinamita', x: 50, y: 20 },    // Arriba
-                    { id: 'Planeta_GorroCowboy', x: 80, y: 50 }, // Der
-                    { id: 'Planeta_Barril', x: 70, y: 80 }, // Abajo Der
-                    { id: 'Planeta_Rueda', x: 20, y: 60 }        // Izq
+                    { id: 'Planeta_Dinamita', x: 50, y: 18 },    // Arriba
+                    { id: 'Planeta_GorroCowboy', x: 75, y: 22 }, // Der
+                    { id: 'Planeta_Barril', x: 74, y: 72 }, // Abajo Der
+                    { id: 'Planeta_Rueda', x: 25, y: 69 }        // Izq
                 ],
-                connections: [['Planeta_Dinamita','Planeta_GorroCowboy'], ['Planeta_GorroCowboy','Planeta_Barril'], ['Planeta_Barril','Planeta_Rueda'], ['Planeta_Rueda','Planeta_Dinamita']],
+                connections: [],
                 exits: { N: 'Planeta_Dinamita', E: 'Planeta_GorroCowboy', S: 'Planeta_Barril', W: 'Planeta_Rueda' }
             },
             'Sistema_Medieval': {
                 nodes: [
-                    { id: 'Planeta_Yelmo', x: 70, y: 30 },   // Arriba Der
-                    { id: 'Planeta_Castillo', x: 50, y: 70 }, // Abajo
-                    { id: 'Planeta_Cadenas', x: 20, y: 80 },  // Abajo Izq
-                    { id: 'Planeta_Escudo', x: 20, y: 40 }    // Arriba Izq
+                    { id: 'Planeta_Yelmo', x: 75, y: 25 },   // Arriba Der
+                    { id: 'Planeta_Castillo', x: 65, y: 65 }, // Abajo
+                    { id: 'Planeta_Cadenas', x: 30, y: 77 },  // Abajo Izq
+                    { id: 'Planeta_Escudo', x: 30, y: 36 }    // Arriba Izq
                 ],
-                connections: [['Planeta_Yelmo','Planeta_Castillo'], ['Planeta_Castillo','Planeta_Cadenas'], ['Planeta_Cadenas','Planeta_Escudo'], ['Planeta_Escudo','Planeta_Yelmo']],
+                connections: [],
                 exits: { N: 'Planeta_Yelmo', E: 'Planeta_Yelmo', S: 'Planeta_Castillo', W: 'Planeta_Cadenas' }
             },
             'Sistema_Futurista': {
                 nodes: [
-                    { id: 'Planeta_Neon', x: 40, y: 20 },     // Arriba
-                    { id: 'Planeta_PlacaBase', x: 80, y: 40 }, // Der
-                    { id: 'Planeta_Holograma', x: 50, y: 85 }  // Abajo
+                    { id: 'Planeta_Neon', x: 34, y: 20 },     // Arriba
+                    { id: 'Planeta_PlacaBase', x: 71, y: 28 }, // Der
+                    { id: 'Planeta_Holograma', x: 38, y: 80 }  // Abajo
                 ],
-                connections: [['Planeta_Neon','Planeta_PlacaBase'], ['Planeta_PlacaBase','Planeta_Holograma'], ['Planeta_Holograma','Planeta_Neon']],
+                connections: [],
                 exits: { N: 'Planeta_Neon', E: 'Planeta_PlacaBase', S: 'Planeta_Holograma', W: 'Planeta_Neon' }
             },
 
             // NIVEL 4
             'Sistema_Windows': {
                 nodes: [
-                    { id: 'Planeta_InternetExplorer', x: 50, y: 15 }, // Arriba "explorer"
-                    { id: 'Planeta_Archivos', x: 80, y: 50 },         // Der "archivos"
-                    { id: 'Planeta_MiPC', x: 50, y: 85 },             // Abajo "mi pc"
-                    { id: 'Planeta_Papelera', x: 20, y: 50 }          // Izq "papelera"
+                    { id: 'Planeta_InternetExplorer', x: 65, y: 15 }, // Arriba "explorer"
+                    { id: 'Planeta_Archivos', x: 78, y: 68 },         // Der "archivos"
+                    { id: 'Planeta_MiPC', x: 40, y: 83 },             // Abajo "mi pc"
+                    { id: 'Planeta_Papelera', x: 25, y: 20 }          // Izq "papelera"
                 ],
-                connections: [['Planeta_InternetExplorer','Planeta_Archivos'], ['Planeta_Archivos','Planeta_MiPC'], ['Planeta_MiPC','Planeta_Papelera'], ['Planeta_Papelera','Planeta_InternetExplorer']],
+                connections: [],
                 exits: { N: 'Planeta_InternetExplorer', E: 'Planeta_Archivos', S: 'Planeta_MiPC', W: 'Planeta_Papelera' }
             },
             'Sistema_Deporte': {
                 nodes: [
-                    { id: 'Planeta_Tenis', x: 40, y: 15 },   // Arriba
-                    { id: 'Planeta_Voley', x: 85, y: 20 },   // Arriba Der
-                    { id: 'Planeta_Futbol', x: 85, y: 60 },  // Abajo Der
-                    { id: 'Planeta_Beisbol', x: 50, y: 85 }, // Abajo
-                    { id: 'Planeta_Basket', x: 15, y: 50 }   // Izq
+                    { id: 'Planeta_Tenis', x: 37, y: 17 },   // Arriba
+                    { id: 'Planeta_Voley', x: 77, y: 20 },   // Arriba Der
+                    { id: 'Planeta_Futbol', x: 73, y: 58 },  // Abajo Der
+                    { id: 'Planeta_Beisbol', x: 42, y: 89 }, // Abajo
+                    { id: 'Planeta_Basket', x: 19, y: 52 }   // Izq
                 ],
-                connections: [['Planeta_Tenis','Planeta_Voley'], ['Planeta_Voley','Planeta_Futbol'], ['Planeta_Futbol','Planeta_Beisbol'], ['Planeta_Beisbol','Planeta_Basket'], ['Planeta_Basket','Planeta_Tenis']],
+                connections: [],
                 exits: { N: 'Planeta_Tenis', E: 'Planeta_Futbol', S: 'Planeta_Beisbol', W: 'Planeta_Basket' }
             },
             'Sistema_Pizza': {
                 nodes: [
-                    { id: 'Planeta_Cebolla', x: 20, y: 30 },   // Arriba Izq
+                    { id: 'Planeta_Cebolla', x: 28, y: 22 },   // Arriba Izq
                     { id: 'Planeta_Tomate', x: 70, y: 30 },    // Arriba Der
-                    { id: 'Planeta_Champiñon', x: 50, y: 90 }, // Abajo
-                    { id: 'Planeta_Pepperoni', x: 20, y: 80 }, // Abajo Izq
-                    { id: 'Planeta_Queso', x: 50, y: 60 }      // Centro
+                    { id: 'Planeta_Champiñon', x: 87, y: 83 }, // Abajo
+                    { id: 'Planeta_Pepperoni', x: 17, y: 50 }, // Abajo Izq
+                    { id: 'Planeta_Queso', x: 58, y: 60 }      // Centro
                 ],
-                connections: [['Planeta_Cebolla','Planeta_Tomate'], ['Planeta_Tomate','Planeta_Queso'], ['Planeta_Queso','Planeta_Pepperoni'], ['Planeta_Pepperoni','Planeta_Cebolla'], ['Planeta_Queso', 'Planeta_Champiñon']],
+                connections: [],
                 exits: { N: 'Planeta_Cebolla', E: 'Planeta_Tomate', S: 'Planeta_Champiñon', W: 'Planeta_Pepperoni' }
             },
             'Sistema_Chuche': {
                 nodes: [
-                    { id: 'Planeta_Gominola', x: 50, y: 20 }, // Arriba
-                    { id: 'Planeta_Chicle', x: 85, y: 45 },   // Der
-                    { id: 'Planeta_Piruleta', x: 80, y: 80 }, // Abajo Der
-                    { id: 'Planeta_Nube', x: 20, y: 75 }      // Abajo Izq
+                    { id: 'Planeta_Gominola', x: 43, y: 17 }, // Arriba
+                    { id: 'Planeta_Chicle', x: 75, y: 41 },   // Der
+                    { id: 'Planeta_Piruleta', x: 65, y: 65 }, // Abajo Der
+                    { id: 'Planeta_Nube', x: 22, y: 72 }      // Abajo Izq
                 ],
-                connections: [['Planeta_Gominola','Planeta_Chicle'], ['Planeta_Chicle','Planeta_Piruleta'], ['Planeta_Piruleta','Planeta_Nube'], ['Planeta_Nube','Planeta_Gominola']],
+                connections: [],
                 exits: { N: 'Planeta_Gominola', E: 'Planeta_Chicle', S: 'Planeta_Piruleta', W: 'Planeta_Nube' }
             },
 
@@ -1486,23 +1486,23 @@
             'Sistema_Gemas': {
                 nodes: [
                     { id: 'Planeta_Esmalte', x: 25, y: 20 },      // Arriba Izq
-                    { id: 'Planeta_Lapislazuli', x: 75, y: 20 },  // Arriba Der
-                    { id: 'Planeta_Topacio', x: 90, y: 50 },      // Der
-                    { id: 'Planeta_Rubi', x: 50, y: 80 },         // Abajo
-                    { id: 'Planeta_Diamante', x: 10, y: 50 }      // Izq
+                    { id: 'Planeta_Lapislazuli', x: 73, y: 16 },  // Arriba Der
+                    { id: 'Planeta_Topacio', x: 82, y: 50 },      // Der
+                    { id: 'Planeta_Rubi', x: 52, y: 75 },         // Abajo
+                    { id: 'Planeta_Diamante', x: 8, y: 55 }      // Izq
                 ],
-                connections: [['Planeta_Esmalte','Planeta_Lapislazuli'], ['Planeta_Lapislazuli','Planeta_Topacio'], ['Planeta_Topacio','Planeta_Rubi'], ['Planeta_Rubi','Planeta_Diamante'], ['Planeta_Diamante','Planeta_Esmalte']],
+                connections: [],
                 exits: { N: 'Planeta_Lapislazuli', E: 'Planeta_Topacio', S: 'Planeta_Rubi', W: 'Planeta_Diamante' }
             },
             'Sistema_Geometria_Minimalista': {
                 nodes: [
                     { id: 'Planeta_Poligono_6', x: 30, y: 20 }, // Arriba Izq (Hex)
                     { id: 'Planeta_Poligono_4', x: 70, y: 40 }, // Arriba Der (Cuadrado)
-                    { id: 'Planeta_Poligono_3', x: 50, y: 80 }, // Abajo (Triangulo)
+                    { id: 'Planeta_Poligono_3', x: 50, y: 68 }, // Abajo (Triangulo)
                     { id: 'Planeta_Poligono_5', x: 20, y: 70 }, // Abajo Izq (Pentagono)
                     { id: 'Planeta_Poligono_7', x: 85, y: 75 }  // Abajo Der (Octogono en imagen, es 7 o 8?)
                 ],
-                connections: [['Planeta_Poligono_6','Planeta_Poligono_4'], ['Planeta_Poligono_4','Planeta_Poligono_7'], ['Planeta_Poligono_7','Planeta_Poligono_3'], ['Planeta_Poligono_3','Planeta_Poligono_5'], ['Planeta_Poligono_5','Planeta_Poligono_6']],
+                connections: [],
                 exits: { N: 'Planeta_Poligono_6', E: 'Planeta_Poligono_4', S: 'Planeta_Poligono_3', W: 'Planeta_Poligono_5' }
             }
         };
@@ -1596,35 +1596,8 @@
                         const connections = layout.connections;
                         const exits = layout.exits;
                         
-                        // SVG Connections
-                        let svgHTML = `<svg class="connections-svg" viewBox="0 0 100 100">`;
-                        
-                        // 1. External Connections (Salidas)
-                        if (exits) {
-                            const nNode = nodes.find(n => n.id === exits.N);
-                            if(nNode) svgHTML += `<line x1="${nNode.x}" y1="${nNode.y}" x2="50" y2="0" class="connection-line" />`;
-                            
-                            const eNode = nodes.find(n => n.id === exits.E);
-                            if(eNode) svgHTML += `<line x1="${eNode.x}" y1="${eNode.y}" x2="100" y2="50" class="connection-line" />`;
-                            
-                            const sNode = nodes.find(n => n.id === exits.S);
-                            if(sNode) svgHTML += `<line x1="${sNode.x}" y1="${sNode.y}" x2="50" y2="100" class="connection-line" />`;
-                            
-                            const wNode = nodes.find(n => n.id === exits.W);
-                            if(wNode) svgHTML += `<line x1="${wNode.x}" y1="${wNode.y}" x2="0" y2="50" class="connection-line" />`;
-                        }
-                        
-                        // 2. Internal Connections (línea más gruesa en grids pequeños)
-                        const lineWidth = scaleFactor * 1.5;
-                        connections.forEach(pair => {
-                             const p1 = nodes.find(n => n.id === pair[0]);
-                             const p2 = nodes.find(n => n.id === pair[1]);
-                             if (p1 && p2) {
-                                 svgHTML += `<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" class="connection-line" style="stroke-width: ${lineWidth}px;" />`;
-                             }
-                        });
-                        
-                        svgHTML += `</svg>`;
+                        // SVG Connections - DESHABILITADO (sin líneas)
+                        let svgHTML = ``;
                         
                         // Planets Nodes (escalados)
                         let nodesHTML = '';
