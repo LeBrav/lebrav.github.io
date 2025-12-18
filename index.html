@@ -224,7 +224,7 @@
             background-repeat: no-repeat;
         }
         
-        /* Overlay oscuro sobre la imagen para que los planetas se vean */
+        /* Overlay muy ligero para no tapar las losetas */
         .map-cell::before {
             content: '';
             position: absolute;
@@ -232,14 +232,14 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(11, 14, 20, 0.4);
+            background: rgba(11, 14, 20, 0.1);
             z-index: 1;
             pointer-events: none;
         }
         
         /* Hover effect para ver mejor la imagen */
         .map-cell:hover::before {
-            background: rgba(11, 14, 20, 0.2);
+            background: rgba(11, 14, 20, 0.05);
         }
         
         /* Fondos por nivel con borde más visible */
@@ -263,13 +263,12 @@
             width: 12px;
             height: 12px;
             border-radius: 50%;
-            background-color: #1f2937; /* Default */
-            border: 2px solid #4b5563;
+            background-color: transparent; /* Invisible */
+            border: none; /* Sin borde */
             z-index: 10;
             display: flex;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 0 8px rgba(0,0,0,0.9), 0 0 4px rgba(0,0,0,0.8);
             transition: transform 0.2s;
         }
         .planet-node:hover {
@@ -278,11 +277,10 @@
             cursor: help;
         }
 
-        /* Colores de Planetas según el sistema (opcional, por ahora genéricos con borde blanco) */
+        /* Colores de Planetas según el sistema (completamente transparente) */
         .planet-node.active-node {
-            background-color: #f0f6fc;
-            border-color: #58a6ff;
-            box-shadow: 0 0 10px rgba(88, 166, 255, 0.6), 0 0 6px rgba(0,0,0,0.9);
+            background-color: transparent;
+            border-color: transparent;
         }
 
         /* Líneas de conexión SVG */
@@ -378,6 +376,15 @@
         .badge-event { background-color: #3fb950; }
         .badge-portal { background-color: #0ea5e9; top: auto; bottom: -8px; }
         .badge-danger { background-color: #ef4444; bottom: -8px; right: auto; left: -8px; }
+        
+        /* Badge centrado cuando solo hay uno */
+        .badge-centered {
+            top: 50% !important;
+            left: 50% !important;
+            right: auto !important;
+            bottom: auto !important;
+            transform: translate(-50%, -50%) scale(1.3) !important;
+        }
         .badge-key { 
             background-color: #eab308; /* Yellow */
             color: black; 
@@ -1605,21 +1612,35 @@
                         nodes.forEach(p => {
                             const pState = data.planetStates && data.planetStates[p.id] ? data.planetStates[p.id] : { shops:0, eventObjects:0, eventPortals:0, eventNegative:0, rebel:0, garbage:0, boss:null, hasKey:false };
                             
+                            // Contar cuántos badges hay
+                            let badgeCount = 0;
+                            if(pState.boss === 'ESTELAR' || pState.boss === 'OSCURO') badgeCount++;
+                            if(pState.hasKey) badgeCount++;
+                            if(pState.shops > 0) badgeCount++;
+                            if(pState.eventObjects > 0) badgeCount++;
+                            if(pState.eventPortals > 0) badgeCount++;
+                            if(pState.rebel > 0) badgeCount++;
+                            if(pState.garbage > 0) badgeCount++;
+                            if(pState.eventNegative > 0 && pState.rebel === 0 && pState.garbage === 0) badgeCount++;
+                            
+                            // Si solo hay 1 badge, agregar clase centered
+                            const centeredClass = badgeCount === 1 ? ' badge-centered' : '';
+                            
                             let badges = '';
                             const badgeSize = 14 * scaleFactor;
                             const badgeFontSize = 8 * scaleFactor;
                             
-                            if(pState.boss === 'ESTELAR') badges += `<div class="planet-badge badge-boss badge-boss-stellar" style="width:${badgeSize+2}px;height:${badgeSize+2}px;font-size:${badgeFontSize+2}px;">E</div>`;
-                            if(pState.boss === 'OSCURO') badges += `<div class="planet-badge badge-boss badge-boss-dark" style="width:${badgeSize+2}px;height:${badgeSize+2}px;font-size:${badgeFontSize+2}px;">O</div>`;
+                            if(pState.boss === 'ESTELAR') badges += `<div class="planet-badge badge-boss badge-boss-stellar${centeredClass}" style="width:${badgeSize+2}px;height:${badgeSize+2}px;font-size:${badgeFontSize+2}px;">E</div>`;
+                            if(pState.boss === 'OSCURO') badges += `<div class="planet-badge badge-boss badge-boss-dark${centeredClass}" style="width:${badgeSize+2}px;height:${badgeSize+2}px;font-size:${badgeFontSize+2}px;">O</div>`;
                             
-                            if(pState.hasKey) badges += `<div class="planet-badge badge-key" style="width:${badgeSize+2}px;height:${badgeSize+2}px;font-size:${badgeFontSize+1}px;" title="Llave Singularidad">🗝️</div>`;
+                            if(pState.hasKey) badges += `<div class="planet-badge badge-key${centeredClass}" style="width:${badgeSize+2}px;height:${badgeSize+2}px;font-size:${badgeFontSize+1}px;" title="Llave Singularidad">🗝️</div>`;
 
-                            if(pState.shops > 0) badges += `<div class="planet-badge badge-shop" style="width:${badgeSize}px;height:${badgeSize}px;font-size:${badgeFontSize}px;">${pState.shops}</div>`;
-                            if(pState.eventObjects > 0) badges += `<div class="planet-badge badge-event" style="width:${badgeSize}px;height:${badgeSize}px;font-size:${badgeFontSize}px;">!</div>`;
-                            if(pState.eventPortals > 0) badges += `<div class="planet-badge badge-portal" style="width:${badgeSize}px;height:${badgeSize}px;font-size:${badgeFontSize}px;">P</div>`;
-                            if(pState.rebel > 0) badges += `<div class="planet-badge badge-danger" style="background-color:#ef4444;width:${badgeSize}px;height:${badgeSize}px;font-size:${badgeFontSize}px;">R</div>`;
-                            if(pState.garbage > 0) badges += `<div class="planet-badge badge-danger" style="background-color:#f97316;width:${badgeSize}px;height:${badgeSize}px;font-size:${badgeFontSize}px;">B</div>`;
-                            if(pState.eventNegative > 0 && pState.rebel === 0 && pState.garbage === 0) badges += `<div class="planet-badge badge-danger" style="width:${badgeSize}px;height:${badgeSize}px;font-size:${badgeFontSize}px;">X</div>`;
+                            if(pState.shops > 0) badges += `<div class="planet-badge badge-shop${centeredClass}" style="width:${badgeSize}px;height:${badgeSize}px;font-size:${badgeFontSize}px;">${pState.shops}</div>`;
+                            if(pState.eventObjects > 0) badges += `<div class="planet-badge badge-event${centeredClass}" style="width:${badgeSize}px;height:${badgeSize}px;font-size:${badgeFontSize}px;">!</div>`;
+                            if(pState.eventPortals > 0) badges += `<div class="planet-badge badge-portal${centeredClass}" style="width:${badgeSize}px;height:${badgeSize}px;font-size:${badgeFontSize}px;">P</div>`;
+                            if(pState.rebel > 0) badges += `<div class="planet-badge badge-danger${centeredClass}" style="background-color:#ef4444;width:${badgeSize}px;height:${badgeSize}px;font-size:${badgeFontSize}px;">R</div>`;
+                            if(pState.garbage > 0) badges += `<div class="planet-badge badge-danger${centeredClass}" style="background-color:#f97316;width:${badgeSize}px;height:${badgeSize}px;font-size:${badgeFontSize}px;">B</div>`;
+                            if(pState.eventNegative > 0 && pState.rebel === 0 && pState.garbage === 0) badges += `<div class="planet-badge badge-danger${centeredClass}" style="width:${badgeSize}px;height:${badgeSize}px;font-size:${badgeFontSize}px;">X</div>`;
 
                             nodesHTML += `
                                 <div class="planet-node active-node" style="left: ${p.x}%; top: ${p.y}%; width:${nodeSize}px; height:${nodeSize}px;" title="${p.id}">
