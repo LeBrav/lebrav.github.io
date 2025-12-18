@@ -1,0 +1,26 @@
+{
+  "name": "big_crunch",
+  "version": "1.0.0",
+  "description": "",
+  "main": "service-worker.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "live-server --port=5500 --open=/index.html",
+    "dev": "live-server --port=5500 --open=/index.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LeBrav/lebrav.github.io.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/LeBrav/lebrav.github.io/issues"
+  },
+  "homepage": "https://github.com/LeBrav/lebrav.github.io#readme",
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  }
+}

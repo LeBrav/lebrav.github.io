@@ -219,20 +219,42 @@
             position: relative;
             overflow: hidden;
             transition: all 0.3s;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
         }
         
-        /* Fondos por nivel sutiles */
-        .cell-lvl-1 { background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0) 80%); border-color: rgba(255,255,255,0.2); }
-        .cell-lvl-2 { background: radial-gradient(circle, rgba(31, 111, 235, 0.15) 0%, rgba(0,0,0,0) 80%); border-color: rgba(31, 111, 235, 0.3); }
-        .cell-lvl-3 { background: radial-gradient(circle, rgba(46, 160, 67, 0.15) 0%, rgba(0,0,0,0) 80%); border-color: rgba(46, 160, 67, 0.3); }
-        .cell-lvl-4 { background: radial-gradient(circle, rgba(210, 153, 34, 0.15) 0%, rgba(0,0,0,0) 80%); border-color: rgba(210, 153, 34, 0.3); }
-        .cell-lvl-5 { background: radial-gradient(circle, rgba(219, 109, 40, 0.15) 0%, rgba(0,0,0,0) 80%); border-color: rgba(219, 109, 40, 0.3); }
+        /* Overlay oscuro sobre la imagen para que los planetas se vean */
+        .map-cell::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(11, 14, 20, 0.4);
+            z-index: 1;
+            pointer-events: none;
+        }
+        
+        /* Hover effect para ver mejor la imagen */
+        .map-cell:hover::before {
+            background: rgba(11, 14, 20, 0.2);
+        }
+        
+        /* Fondos por nivel con borde más visible */
+        .cell-lvl-1 { border-color: rgba(255,255,255,0.3); }
+        .cell-lvl-2 { border-color: rgba(31, 111, 235, 0.5); box-shadow: 0 0 8px rgba(31, 111, 235, 0.3); }
+        .cell-lvl-3 { border-color: rgba(46, 160, 67, 0.5); box-shadow: 0 0 8px rgba(46, 160, 67, 0.3); }
+        .cell-lvl-4 { border-color: rgba(210, 153, 34, 0.5); box-shadow: 0 0 8px rgba(210, 153, 34, 0.3); }
+        .cell-lvl-5 { border-color: rgba(219, 109, 40, 0.5); box-shadow: 0 0 8px rgba(219, 109, 40, 0.3); }
 
         /* Sistema Planetario Interno */
         .system-container {
             width: 100%;
             height: 100%;
             position: relative;
+            z-index: 2;
         }
         
         .planet-node {
@@ -247,7 +269,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 0 4px rgba(0,0,0,0.8);
+            box-shadow: 0 0 8px rgba(0,0,0,0.9), 0 0 4px rgba(0,0,0,0.8);
             transition: transform 0.2s;
         }
         .planet-node:hover {
@@ -259,7 +281,8 @@
         /* Colores de Planetas según el sistema (opcional, por ahora genéricos con borde blanco) */
         .planet-node.active-node {
             background-color: #f0f6fc;
-            border-color: #8b949e;
+            border-color: #58a6ff;
+            box-shadow: 0 0 10px rgba(88, 166, 255, 0.6), 0 0 6px rgba(0,0,0,0.9);
         }
 
         /* Líneas de conexión SVG */
@@ -417,13 +440,18 @@
             bottom: 2px;
             left: 2px;
             font-size: 0.4rem;
-            color: rgba(255,255,255,0.3);
+            color: rgba(255,255,255,0.95);
             pointer-events: none;
             text-transform: uppercase;
             max-width: 90%;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.5) 80%, transparent 100%);
+            padding: 2px 4px 2px 2px;
+            border-radius: 2px;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.7);
+            font-weight: 700;
         }
 
     </style>
@@ -850,7 +878,7 @@
                     </h3>
                     <ul class="list-disc list-inside space-y-1 ml-2 text-gray-300">
                         <li><strong class="text-white">Ayuda:</strong> Puede dar vida y combustible al resto de jugadores pero <strong class="text-cyan-300">sin gastar de sus recursos</strong>.</li>
-                        <li><strong class="text-white">Mismo planeta:</strong> Si se encuentra en la misma planeta les puede dar máximo <span class="text-red-400">5 de vida</span> y <span class="text-orange-400">18 de combustible</span>.</li>
+                        <li><strong class="text-white">Mismo planeta:</strong> Si se encuentra en la misma planeta les puede dar máximo <span class="text-red-400">5 de vida</span> y <span class="text-orange-400">8 de combustible</span>.</li>
                         <li><strong class="text-white">PASIVA - Curación:</strong> Por cada movimiento sobrante de los 3 o 2 que pueda tener, se cura gastando <strong class="text-white">1 movimiento</strong>: <span class="text-red-400">+2HP</span> y <span class="text-orange-400">+3 Combustible</span>.</li>
                         <li><strong class="text-white">Recursos iniciales:</strong> <span class="text-orange-400">15 combustible</span> y <span class="text-red-400">9 vidas</span>.</li>
                     </ul>
@@ -1137,17 +1165,15 @@
                 { id: 'Carta_UltimaVoluntad_CorreoPrime', rareza: 'epico', niveles: [2, 3, 4, 5], desc: 'AL MORIR: Envía fichas Potencia y hasta 2 cartas a un jugador vivo.' },
             ],
             Habilidad: [
-                { id: 'Habilidad_Estelar_Chispa', rareza: 'raro', niveles: [2, 3], desc: 'ACTIVA: Mueve +1 planeta gratis al comprar Estelar.' },
+                { id: 'Habilidad_Estelar_Chispa', rareza: 'raro', niveles: [2, 3], desc: 'PASIVA: Mueve +1 planeta gratis al comprar Estelar.' },
                 { id: 'Habilidad_Grav_SaltoGravitacional', rareza: 'raro', niveles: [2, 3], desc: 'ACTIVA: Al comprar poder oscuro, en el siguiente turno, +2 movimiento gratis (sin combustible) siempre y cuando dentro de estos 2 movimientos te permitan llegar a una tienda.' },
-                { id: 'Habilidad_Grav_AtraerObjeto', rareza: 'raro', niveles: [3, 4], desc: 'ACTIVA: Atrae objeto (dist 3).' },
-                { id: 'Habilidad_ExpansiónTemporal', rareza: 'epico', niveles: [3, 4, 5], desc: 'ACTIVA: Repite movimiento.' },
+                { id: 'Habilidad_Grav_AtraerObjeto', rareza: 'raro', niveles: [3, 4], desc: 'PASIVA: Atrae objeto (dist 3).' },
+                { id: 'Habilidad_ExpansiónTemporal', rareza: 'epico', niveles: [3, 4, 5], desc: 'ACTIVA: Puedes moverte el doble de casillas este turno.' },
                 { id: 'Habilidad_Estelar_Duplicacion', rareza: 'epico', niveles: [5], desc: 'PASIVA: Estelares x2.', legendaria: true, maxApariciones: 1 },
                 { id: 'Habilidad_Grav_MasaDoble', rareza: 'epico', niveles: [5], desc: 'PASIVA: Gravitatorias x2.', legendaria: true, maxApariciones: 1 },
                 { id: 'Habilidad_ProtecciónPlanetaria', rareza: 'epico', niveles: [4, 5], desc: 'PASIVA: Protege hasta 1 de daño por turno.' },
-                { id: 'Habilidad_LlaveTemporal', rareza: 'epico', niveles: [3, 4], desc: 'PASIVA: Permite pasar por sistemas planetarios explotados.' },
-                { id: 'Habilidad_LlaveTemporal', rareza: 'raro', niveles: [4, 5], desc: 'PASIVA: Permite pasar por sistemas planetarios explotados.' },
-                { id: 'Habilidad_EstabilizadorEstelar', rareza: 'epico', niveles: [3,5], desc: 'ACTIVA: Evita la explosión inminente de un sistema planetario (un solo uso, donde sea del universo).' },
-                { id: 'Habilidad_EstabilizadorEstelar', rareza: 'raro', niveles: [4], desc: 'ACTIVA: Evita la explosión inminente de un sistema planetario (un solo uso, donde sea del universo).' },
+                { id: 'Habilidad_LlaveTemporal', rareza: 'epico', niveles: [3, 4, 5], desc: 'PASIVA: Permite pasar por sistemas planetarios explotados.' },
+                { id: 'Habilidad_EstabilizadorEstelar', rareza: 'epico', niveles: [3,4,5], desc: 'ACTIVA: Evita la explosión inminente de un sistema planetario (un solo uso, donde sea del universo).' },
                 { id: 'Habilidad_CrearPortal', rareza: 'epico', niveles: [5], desc: 'ACTIVA: Crea un portal de 2 puertas (2 planetas) donde tú quieras del universo.', legendaria: true, maxApariciones: 1 },
                 { id: 'Habilidad_DisfrazRebelde', rareza: 'raro', niveles: [3, 4, 5], desc: 'PASIVA: No te afectan los planetas rebeldes.' },
                 { id: 'Habilidad_MembranaAntiradioactiva', rareza: 'raro', niveles: [3, 4, 5], desc: 'PASIVA: No te afectan los sistemas planetarios infectados.' },
@@ -1561,6 +1587,10 @@
                     if (data) {
                         cell.classList.add(`cell-lvl-${data.level}`);
                         
+                        // Aplicar imagen de fondo del sistema planetario
+                        const tileImagePath = `losetas_juego/${data.systemName}.png`;
+                        cell.style.backgroundImage = `url('${tileImagePath}')`;
+                        
                         const layout = getSystemLayout(data.systemName);
                         const nodes = layout.nodes;
                         const connections = layout.connections;
@@ -1939,6 +1969,20 @@
             }
 
             if (compact) {
+                // Usar imagen de carta para Habilidades y Especiales en modo compact
+                if (item.tipoObjeto === 'Habilidad' || item.tipoObjeto === 'Especial') {
+                    const cardImagePath = `cards/${item.id}.png`;
+                    return `
+                        <div class="event-item-preview p-2 bg-[#0b0e14] border ${isLegendaria ? 'border-yellow-500' : 'border-gray-700'} rounded-xl flex flex-col gap-1">
+                            <div class="relative">
+                                <img src="${cardImagePath}" alt="${item.id.replace(/_/g, ' ')}" class="w-full h-auto rounded-lg" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22280%22%3E%3Crect fill=%22%23161b22%22 width=%22200%22 height=%22280%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 font-family=%22Arial%22 font-size=%2212%22 fill=%22%2358a6ff%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22%3E${item.id.replace(/_/g, ' ')}%3C/text%3E%3C/svg%3E';" />
+                                <span class="absolute top-1 right-1 rarity-tag ${rarityClass} text-[9px] shadow-lg scale-90">${isLegendaria ? 'LEGENDARIA' : item.rareza.toUpperCase()}</span>
+                            </div>
+                            ${isLegendaria ? `<p class="text-[9px] text-yellow-400 font-bold text-center px-1 py-0.5 bg-yellow-900/20 rounded">⭐ ${LEGENDARIAS_APARICIONES[item.id] || 0}/${item.maxApariciones}</p>` : ''}
+                        </div>
+                    `;
+                }
+                
                 let compactDetails = "";
                 if (item.potenciaValor) compactDetails += `<div class="mt-1"><span class="text-[10px] bg-gray-800 px-1.5 py-0.5 rounded text-yellow-200 border border-gray-700 inline-block font-mono">⚡ Potencia: ${item.potenciaValor}</span></div>`;
                 if (item.desc) compactDetails += `<p class="text-[10px] text-gray-400 italic mt-1">"${item.desc}"</p>`;
@@ -1958,6 +2002,21 @@
                             <span class="rarity-tag ${rarityClass} scale-90 origin-right">${isLegendaria ? 'LEGENDARIA' : item.rareza}</span>
                         </div>
                         ${compactDetails}
+                    </div>
+                `;
+            }
+
+            // Usar imagen de carta para Habilidades y Especiales
+            if (item.tipoObjeto === 'Habilidad' || item.tipoObjeto === 'Especial') {
+                const cardImagePath = `cards/${item.id}.png`;
+                const borderColor = item.tipoObjeto === 'Habilidad' ? 'hover:border-cyan-500 hover:shadow-cyan-500/20' : 'hover:border-purple-500 hover:shadow-purple-500/20';
+                return `
+                    <div class="p-2 bg-[#0b0e14] border-2 ${isLegendaria ? 'border-yellow-500' : 'border-gray-700'} rounded-xl flex flex-col gap-2 ${borderColor} hover:shadow-lg transition-all">
+                        <div class="relative">
+                            <img src="${cardImagePath}" alt="${item.id.replace(/_/g, ' ')}" class="w-full h-auto rounded-lg" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22280%22%3E%3Crect fill=%22%23161b22%22 width=%22200%22 height=%22280%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 font-family=%22Arial%22 font-size=%2214%22 fill=%22%2358a6ff%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22%3E${item.id.replace(/_/g, ' ')}%3C/text%3E%3C/svg%3E';" />
+                            <span class="absolute top-2 right-2 rarity-tag ${rarityClass} text-[10px] shadow-lg">${isLegendaria ? 'LEGENDARIA' : item.rareza.toUpperCase()}</span>
+                        </div>
+                        ${isLegendaria ? `<p class="text-[10px] text-yellow-400 font-bold text-center px-2 py-1 bg-yellow-900/20 rounded border border-yellow-600/30">⭐ ${LEGENDARIAS_APARICIONES[item.id] || 0}/${item.maxApariciones} apariciones</p>` : ''}
                     </div>
                 `;
             }
