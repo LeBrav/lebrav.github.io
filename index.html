@@ -202,12 +202,52 @@
             gap: 4px; /* Pequeño espacio visual entre cartas */
             aspect-ratio: 1 / 1;
             width: 100%;
-            max-width: 600px; /* Un poco más grande para ver detalles */
+            max-width: 800px; /* Más grande en general */
             margin: 0 auto;
             background-color: #05070a;
             padding: 4px;
             border-radius: 8px;
             transition: all 0.3s ease;
+        }
+        
+        /* En móvil ocupar casi todo el ancho */
+        @media (max-width: 768px) {
+            .map-grid {
+                max-width: 95vw;
+                gap: 2px;
+                padding: 2px;
+            }
+            
+            /* Hacer las cartas de la tienda más compactas en móvil */
+            #shop-inventory-container img {
+                border-radius: 4px;
+            }
+            
+            #shop-inventory-container .rarity-tag {
+                font-size: 0.5rem;
+                padding: 1px 4px;
+            }
+            
+            /* Reducir padding en cartas de tienda en móvil */
+            #shop-inventory-container > div {
+                padding: 0.25rem !important;
+            }
+            
+            /* Mejorar visibilidad de planetas en mapa móvil */
+            .planet-node {
+                width: 16px !important;
+                height: 16px !important;
+            }
+            
+            /* Iconos de mapa más grandes en móvil */
+            .planet-icon {
+                font-size: 10px !important;
+            }
+            
+            /* Mejorar visibilidad del número de nivel en celdas */
+            .level-label {
+                font-size: 8px !important;
+            }
         }
         
         /* Dinámicamente se ajustará grid-template-columns vía JS */
@@ -463,7 +503,7 @@
 
     </style>
 </head>
-<body class="p-2 sm:p-6 min-h-screen">
+<body class="p-1 sm:p-4 md:p-6 min-h-screen">
 
     <!-- PANTALLA DE INICIO / SELECCIÓN DE PERSONAJES -->
     <div id="setup-screen" class="max-w-4xl mx-auto mt-10">
@@ -559,18 +599,18 @@
     <div id="game-app" class="max-w-6xl mx-auto hidden">
         
         <!-- Header con Reset y Objetivo -->
-        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 border-b border-gray-700 pb-6 gap-6">
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-4 md:mb-6 border-b border-gray-700 pb-4 md:pb-6 gap-4 md:gap-6">
             <div>
-                <h1 class="text-3xl sm:text-4xl font-black text-[#ffcc00] flex items-center gap-3 tracking-tight" style="text-shadow: 0 0 20px rgba(255, 204, 0, 0.2);">
-                    <i data-lucide="rocket" class="w-8 h-8 sm:w-10 sm:h-10"></i>
+                <h1 class="text-2xl sm:text-3xl md:text-4xl font-black text-[#ffcc00] flex items-center gap-2 md:gap-3 tracking-tight" style="text-shadow: 0 0 20px rgba(255, 204, 0, 0.2);">
+                    <i data-lucide="rocket" class="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10"></i>
                     BIG CRUNCH
                 </h1>
-                <span class="text-sm font-normal text-gray-500 tracking-normal opacity-70 ml-1">Asistente de Tablero v2.0</span>
+                <span class="text-xs md:text-sm font-normal text-gray-500 tracking-normal opacity-70 ml-1">Asistente de Tablero v2.0</span>
             </div>
 
-            <div class="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
+            <div class="flex flex-col sm:flex-row gap-3 md:gap-4 w-full lg:w-auto">
                 <!-- OBJETIVO DISPLAY -->
-                <div class="goal-display px-6 py-3 rounded-xl flex items-center justify-center gap-3 text-white w-full sm:w-auto">
+                <div class="goal-display px-4 md:px-6 py-2 md:py-3 rounded-xl flex items-center justify-center gap-2 md:gap-3 text-white w-full sm:w-auto">
                     <i data-lucide="zap" class="w-6 h-6 text-purple-300 animate-pulse"></i>
                     <div class="flex flex-col">
                         <span class="text-xs text-purple-300 font-bold tracking-widest">OBJETIVO FINAL</span>
@@ -598,34 +638,34 @@
         </div>
 
         <!-- Main Content Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6 mb-6">
             
             <!-- Left Column: Map & Events -->
-            <div class="lg:col-span-7 flex flex-col gap-6">
+            <div class="lg:col-span-7 flex flex-col gap-4 md:gap-6">
                 
                 <!-- Mapa Visual -->
-                <div class="card p-6 rounded-2xl">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-xl font-bold flex items-center gap-2 text-yellow-400">
-                            <i data-lucide="map" class="w-6 h-6"></i>
+                <div class="card p-3 md:p-6 rounded-xl md:rounded-2xl">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-3 md:mb-4 gap-2 sm:gap-0">
+                        <h2 class="text-lg md:text-xl font-bold flex items-center gap-2 text-yellow-400">
+                            <i data-lucide="map" class="w-5 h-5 md:w-6 md:h-6"></i>
                             Mapa Galáctico
                         </h2>
-                        <button onclick="handleTurnCycle()" id="btn-next-level" class="btn btn-primary py-2 px-4 rounded-lg font-bold text-sm shadow-lg flex items-center gap-2">
+                        <button onclick="handleTurnCycle()" id="btn-next-level" class="btn btn-primary py-2 px-3 md:px-4 rounded-lg font-bold text-xs md:text-sm shadow-lg flex items-center gap-2 w-full sm:w-auto justify-center">
                             <i data-lucide="arrow-right-circle" class="w-4 h-4"></i>
                             SIGUIENTE TURNO
                         </button>
                     </div>
                     
-                    <div class="flex flex-col md:flex-row gap-6 items-start">
+                    <div class="flex flex-col md:flex-row gap-4 md:gap-6 items-start">
                         <!-- Grid Container -->
-                        <div class="w-full md:w-2/3 bg-[#05070a] p-4 rounded-xl border border-gray-800 shadow-inner">
+                        <div class="w-full md:w-2/3 bg-[#05070a] p-2 md:p-4 rounded-xl border border-gray-800 shadow-inner">
                             <div id="visual-map" class="map-grid">
                                 <!-- Cells injected via JS -->
                             </div>
                         </div>
                         
                         <!-- Info Panel -->
-                        <div class="w-full md:w-1/3 flex flex-col gap-4">
+                        <div class="w-full md:w-1/3 flex flex-col gap-3 md:gap-4">
                             <div id="map-output" class="text-xs text-gray-400 bg-[#0d1117] p-3 rounded-lg border border-gray-700">
                                 <p class="font-bold text-yellow-500 mb-1">ESTADO</p>
                                 Nivel 1 Activo.
@@ -656,15 +696,15 @@
                 </div>
 
                 <!-- Eventos -->
-                <div class="card p-6 rounded-2xl">
-                    <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-red-400">
+                <div class="card p-3 md:p-6 rounded-xl md:rounded-2xl">
+                    <h2 class="text-lg md:text-xl font-bold mb-3 md:mb-4 flex items-center gap-2 text-red-400">
                         <i data-lucide="alert-triangle" class="w-5 h-5"></i>
                         3. Eventos de Turno
                     </h2>
-                    <button onclick="generateEvent()" class="btn btn-danger w-full py-3 rounded-lg font-semibold shadow-md mb-4 bg-opacity-80">
+                    <button onclick="generateEvent()" class="btn btn-danger w-full py-2 md:py-3 rounded-lg font-semibold shadow-md mb-3 md:mb-4 bg-opacity-80">
                         GENERAR EVENTOS
                     </button>
-                    <div id="event-output" class="bg-[#0d1117] border border-gray-800 p-4 rounded-xl text-sm text-gray-300 flex flex-col gap-2 min-h-[150px]">
+                    <div id="event-output" class="bg-[#0d1117] border border-gray-800 p-2 md:p-4 rounded-xl text-xs md:text-sm text-gray-300 flex flex-col gap-2 min-h-[150px]">
                         <div class="text-center italic text-gray-500 my-auto">Pulsa para generar los eventos...</div>
                     </div>
                 </div>
@@ -672,10 +712,10 @@
 
             <!-- Right Column: Shop Inventory -->
             <div class="lg:col-span-5">
-                <div class="card p-6 rounded-2xl border border-gray-700 h-full flex flex-col">
-                    <div class="flex justify-between items-end mb-4 border-b border-gray-700 pb-4">
-                        <h2 class="text-xl font-bold flex items-center gap-2 text-green-400">
-                            <i data-lucide="shopping-cart" class="w-6 h-6"></i>
+                <div class="card p-3 md:p-6 rounded-xl md:rounded-2xl border border-gray-700 h-full flex flex-col">
+                    <div class="flex justify-between items-end mb-3 md:mb-4 border-b border-gray-700 pb-3 md:pb-4">
+                        <h2 class="text-lg md:text-xl font-bold flex items-center gap-2 text-green-400">
+                            <i data-lucide="shopping-cart" class="w-5 h-5 md:w-6 md:h-6"></i>
                             Mercado
                         </h2>
                         <div class="text-[10px] text-right space-y-1 font-mono text-gray-500" id="shop-rarity-display">
@@ -685,21 +725,21 @@
                         </div>
                     </div>
                     
-                    <div class="flex flex-col gap-3 mb-4">
-                        <select id="shop-level-select" onchange="updateShopRarityDisplay(this.value)" class="w-full p-2 rounded-lg bg-[#0d1117] border border-gray-600 text-white text-sm font-bold focus:ring-1 focus:ring-green-500 outline-none">
+                    <div class="flex flex-col gap-2 md:gap-3 mb-3 md:mb-4">
+                        <select id="shop-level-select" onchange="updateShopRarityDisplay(this.value)" class="w-full p-2 rounded-lg bg-[#0d1117] border border-gray-600 text-white text-xs md:text-sm font-bold focus:ring-1 focus:ring-green-500 outline-none">
                             <option value="" disabled selected>Nivel de Tienda</option>
                             <option value="2">Nivel 2</option>
                             <option value="3">Nivel 3</option>
                             <option value="4">Nivel 4</option>
                             <option value="5">Nivel 5 (Épico)</option>
                         </select>
-                        <button onclick="generateShopInventory()" class="btn btn-primary w-full py-2 px-4 rounded-lg font-bold shadow-lg flex justify-center items-center gap-2 bg-gradient-to-r from-green-600 to-teal-600 border-green-500 hover:from-green-500 hover:to-teal-500">
+                        <button onclick="generateShopInventory()" class="btn btn-primary w-full py-2 px-3 md:px-4 rounded-lg font-bold text-xs md:text-sm shadow-lg flex justify-center items-center gap-2 bg-gradient-to-r from-green-600 to-teal-600 border-green-500 hover:from-green-500 hover:to-teal-500">
                             <i data-lucide="refresh-cw" class="w-4 h-4"></i>
                             GENERAR STOCK
                         </button>
                     </div>
 
-                    <div id="shop-inventory-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto flex-grow content-start">
+                    <div id="shop-inventory-container" class="grid grid-cols-2 md:grid-cols-2 gap-2 md:gap-3 overflow-y-auto flex-grow content-start">
                         <div class="col-span-full text-center py-8 text-gray-500 border border-dashed border-gray-700 rounded-xl text-xs">
                             Genera la tienda para ver objetos.
                         </div>
